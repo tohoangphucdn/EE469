@@ -1,0 +1,120 @@
+module cpu(
+	input wire clk,
+	input wire nreset,
+	output wire led,
+	output wire [7:0] debug_port1,
+	output wire [7:0] debug_port2,
+	output wire [7:0] debug_port3,
+	output wire [7:0] debug_port4,
+	output wire [7:0] debug_port5,
+	output wire [7:0] debug_port6,
+	output wire [7:0] debug_port7
+	);
+
+	
+	wire reset;
+	wire [31:0] regdata1, regdata2, memdata;
+	reg [31:0] inst;
+	reg [31:0] inst_full [100:0];
+	reg [31:0] pc;
+	reg [1:0] state;
+	wire [3:0] cond, op, rn, rd, rm; 
+	wire [11:0] operand;
+	wire [7:0] out1, out2, out3, out4, out5;
+	wire b, l, t;
+	wire [23:0] offset;
+	
+	// Reg files and memory controller
+	wire regaddrIn, regaddrOut1, regaddrOut2, regdataIn;
+	wire regwr, regrd1, regrd2, memwr, memrd;
+	wire [31:0] memaddrIn, memaddrOut, memdataIn; 
+	wire bf;
+	wire [31:0] branchimm; 
+	
+	// Controls the LED on the board.
+	assign led = 1'b1;
+	assign reset = ~nreset;
+	// Read in the instruction file
+	initial begin
+		$readmemb("inst.txt", inst_full);
+	end
+
+	
+
+	cycles operation(clk, state, op, b, l, t, offset, cond, rn, rd, rm, operand, regdata1, regdata2, memdata,
+						 regaddrIn, regaddrOut1, regaddrOut2, regdataIn, regwr, regrd1, regrd2, 
+						 memaddrIn, memaddrOut, memdataIn, memwr, memrd, bf, branchimm); 
+	
+
+	registers RAM(clk, regaddrIn, regaddrOut1, regaddrOut2, regdataIn, regwr, regrd1, regrd2, regdata1, regdata2);
+	
+	memory MEM(clk, memaddrIn, memaddrOut, memdataIn, memwr, memrd, memdata);
+	
+	decode decoder(inst, b, l, t, offset, cond, op, rn, rd, rm, operand);
+	
+	interpreter inter(b, l, t, offset, op, rn, rd, rm, operand, out1, out2, out3, out4, out5);
+	
+	always @(posedge clk) begin
+		if (reset) begin
+			state <= 2'b00;
+			pc <= 32'b0;
+		end
+		else begin
+			case (state)
+				2'b00: begin						
+							state <= state + 1;
+						 end
+				2'b01: begin
+							state <= state + 1;
+						 end
+				2'b10: begin
+							state <= state + 1;
+						 end
+				2'b11: begin			
+							if (!bf)
+								pc <= pc + 1;
+							else pc <= pc + branchimm;
+							state <= 2'b00;
+						 end
+			endcase
+		end
+	end
+	
+	
+	// These are how you communicate back to the serial port debugger.
+	assign debug_port1 = {(pc[5:0]-1'b1),2'b0};
+	assign debug_port2 = cond;
+	
+	
+	// Logic for register fields
+	assign debug_port3 = out1;
+	assign debug_port4 = out2;
+	assign debug_port5 = out3;
+	assign debug_port6 = out4;	
+	assign debug_port7 = out5;
+	
+
+endmodule
+
+module cpu_testbench();
+	reg clk, nreset;
+	wire led;
+	wire [7:0] debug_port1,debug_port2, debug_port3, debug_port4, 
+				  debug_port5, debug_port6, debug_port7;
+
+	cpu dut(clk, nreset, led, debug_port1, debug_port2, debug_port3, 
+					 debug_port4, debug_port5, debug_port6, debug_port7);
+
+	// Set up the clock.
+	always begin
+		clk = 1; #5; clk = 0; #5;
+	end
+
+	// Set up the inputs to the design. Each line is a clock cycle.
+	integer i;
+	initial begin
+						#10;
+		nreset <= 0;	#10;
+		nreset <= 1; #200;
+  end
+endmodule
