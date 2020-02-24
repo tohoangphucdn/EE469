@@ -2,11 +2,13 @@ module cycles(
 	input wire clk,
 	input wire [1:0] state,
 	input wire [3:0] op,
-	input wire b, l, t,
+	input wire b, l, t, s,
 	input wire [23:0] offset,
 	input wire [3:0] cond, rn, rd, rm,
 	input wire [11:0] operand,
 	input wire [31:0] regdata1, regdata2, memdata,
+	
+	
 	output wire [31:0] regaddrIn, regaddrOut1, regaddrOut2, regdataIn,
 	output wire regwr, regrd1, regrd2,
 	output wire [31:0] memaddrIn, memaddrOut, memdataIn,
@@ -14,7 +16,13 @@ module cycles(
 	output wire bf,
 	output wire [31:0] branchimm 
 	);
-
+	
+	// t = 0 => operand is register
+	// t = 1 => operand is number
+	// call ALU(op, value1, value2, results, cpsr)
+	// not use ALU => op = 4'b0
+	
+	reg [31:0] cpsr;
 	assign regaddrIn 		= 0;
 	assign regaddrOut1 	= 0;
 	assign regaddrOut2 	= 0;
@@ -87,6 +95,7 @@ module cycles(
 		4'b0100: begin // ADD *
 						case (state)
 						2'b00: begin
+						
 								end
 						2'b01: begin
 								end

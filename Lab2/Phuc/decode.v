@@ -14,7 +14,7 @@
 */
 module decode(
 	input wire [31:0] inst,
-	output wire bout,lout, otout,
+	output wire bout,lout, otout, sout
 	output wire [23:0] offset,
 	output wire [3:0] cond, op, rn, rd, rm,
 	output wire [11:0] operand
@@ -28,7 +28,9 @@ module decode(
 	assign op = inst[24:21];
 	assign operand = inst[11:0];
 	assign otout  = inst[25];
+	assign sout = inst[20];
 	assign offset = inst[23:0];
+	
   
 	assign rn = rn_temp;
 	assign rd = rd_temp;

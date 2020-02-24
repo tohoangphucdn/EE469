@@ -34,14 +34,15 @@ module cpu(
 	// Controls the LED on the board.
 	assign led = 1'b1;
 	assign reset = ~nreset;
+	
 	// Read in the instruction file
 	initial begin
 		$readmemb("inst.txt", inst_full);
 	end
 
-	
+	decode decoder(inst, b, l, t, s, offset, cond, op, rn, rd, rm, operand);
 
-	cycles operation(clk, state, op, b, l, t, offset, cond, rn, rd, rm, operand, regdata1, regdata2, memdata,
+	cycles operation(clk, state, op, b, l, t, s, offset, cond, rn, rd, rm, operand, regdata1, regdata2, memdata,
 						 regaddrIn, regaddrOut1, regaddrOut2, regdataIn, regwr, regrd1, regrd2, 
 						 memaddrIn, memaddrOut, memdataIn, memwr, memrd, bf, branchimm); 
 	
@@ -50,7 +51,7 @@ module cpu(
 	
 	memory MEM(clk, memaddrIn, memaddrOut, memdataIn, memwr, memrd, memdata);
 	
-	decode decoder(inst, b, l, t, offset, cond, op, rn, rd, rm, operand);
+	
 	
 	interpreter inter(b, l, t, offset, op, rn, rd, rm, operand, out1, out2, out3, out4, out5);
 	
@@ -60,23 +61,12 @@ module cpu(
 			pc <= 32'b0;
 		end
 		else begin
-			case (state)
-				2'b00: begin						
-							state <= state + 1;
-						 end
-				2'b01: begin
-							state <= state + 1;
-						 end
-				2'b10: begin
-							state <= state + 1;
-						 end
-				2'b11: begin			
-							if (!bf)
-								pc <= pc + 1;
-							else pc <= pc + branchimm;
-							state <= 2'b00;
-						 end
-			endcase
+			if (state == 2'b11) begin
+				if (!bf) pc <= pc + 1;
+				else pc <= pc + branchimm;
+				state <= 2'b00;
+			end
+			else state <= state + 1;
 		end
 	end
 	
