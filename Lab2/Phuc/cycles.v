@@ -38,205 +38,210 @@ module cycles(
 	assign bf 				= 0;
 	assign branchimm 		= 0;
 	
+	
+	
 	always @(posedge clk) begin
-		case (op)
-		4'b0000: begin // AND
-						case (state)
-						2'b00: begin
-						  //  fetch in main
-								end
-						2'b01: begin
-						  // read register file
-								end
-						2'b10: begin
-						  // shift
-								end
-						2'b11: begin
-						  // push and output
-								end
-						endcase
-					end
-		4'b0001: begin // EOR *
-						case (state)
-						2'b00: begin
-								end
-						2'b01: begin
-								end
-						2'b10: begin
-								end
-						2'b11: begin
-								end
-						endcase
-					end
-		4'b0010: begin // SUB *
-						case (state)
-						2'b00: begin
-								end
-						2'b01: begin
-								end
-						2'b10: begin
-								end
-						2'b11: begin
-								end
-						endcase
-					end
-		4'b0011: begin // RSB *
-						case (state)
-						2'b00: begin
-								end
-						2'b01: begin
-								end
-						2'b10: begin
-								end
-						2'b11: begin
-								end
-						endcase
-					end
-		4'b0100: begin // ADD *
-						case (state)
-						2'b00: begin
-						
-								end
-						2'b01: begin
-								end
-						2'b10: begin
-								end
-						2'b11: begin
-								end
-						endcase
-					end
-		4'b0101: begin // ADC *
-						case (state)
-						2'b00: begin
-								end
-						2'b01: begin
-								end
-						2'b10: begin
-								end
-						2'b11: begin
-								end
-						endcase
-					end
-		4'b0110: begin // SBC *
-						case (state)
-						2'b00: begin
-								end
-						2'b01: begin
-								end
-						2'b10: begin
-								end
-						2'b11: begin
-								end
-						endcase
-					end
-		4'b0111: begin // RSC *
-						case (state)
-						2'b00: begin
-								end
-						2'b01: begin
-								end
-						2'b10: begin
-								end
-						2'b11: begin
-								end
-						endcase
-					end
-		4'b1000: begin // TST
-						case (state)
-						2'b00: begin
-								end
-						2'b01: begin
-								end
-						2'b10: begin
-								end
-						2'b11: begin
-								end
-						endcase
-					end
-		4'b1001: begin// TEQ
-						case (state)
-						2'b00: begin
-								end
-						2'b01: begin
-								end
-						2'b10: begin
-								end
-						2'b11: begin
-								end
-						endcase
-					end
-		4'b1010: begin// CMP
-						case (state)
-						2'b00: begin
-								end
-						2'b01: begin
-								end
-						2'b10: begin
-								end
-						2'b11: begin
-								end
-						endcase
-					end
-		4'b1011: begin// CMN
-						case (state)
-						2'b00: begin
-								end
-						2'b01: begin
-								end
-						2'b10: begin
-								end
-						2'b11: begin
-								end
-						endcase
-					end
-		4'b1100: begin // ORR *
-						case (state)
-						2'b00: begin
-								end
-						2'b01: begin
-								end
-						2'b10: begin
-								end
-						2'b11: begin
-								end
-						endcase
-					end
-		4'b1101: begin// MOV
-						case (state)
-						2'b00: begin
-								end
-						2'b01: begin
-								end
-						2'b10: begin
-								end
-						2'b11: begin
-								end
-						endcase
-					end
-		4'b1110: begin // BIC *
-						case (state)
-						2'b00: begin
-								end
-						2'b01: begin
-								end
-						2'b10: begin
-								end
-						2'b11: begin
-								end
-						endcase
-					end
-		4'b1111: begin // MVN
-						case (state)
-						2'b00: begin
-								end
-						2'b01: begin
-								end
-						2'b10: begin
-								end
-						2'b11: begin
-								end
-						endcase
-					end
-		endcase
+		if (b) begin
+		end
+		else
+			case (op)
+			4'b0000: begin // AND
+							case (state)
+							2'b00: begin
+							  //  fetch in main
+									end
+							2'b01: begin
+							  // read register file
+									end
+							2'b10: begin
+							  // shift
+									end
+							2'b11: begin
+							  // push and output
+									end
+							endcase
+						end
+			4'b0001: begin // EOR *
+							case (state)
+							2'b00: begin
+									end
+							2'b01: begin
+									end
+							2'b10: begin
+									end
+							2'b11: begin
+									end
+							endcase
+						end
+			4'b0010: begin // SUB *
+							case (state)
+							2'b00: begin
+									end
+							2'b01: begin
+									end
+							2'b10: begin
+									end
+							2'b11: begin
+									end
+							endcase
+						end
+			4'b0011: begin // RSB *
+							case (state)
+							2'b00: begin
+									end
+							2'b01: begin
+									end
+							2'b10: begin
+									end
+							2'b11: begin
+									end
+							endcase
+						end
+			4'b0100: begin // ADD *
+							case (state)
+							2'b00: begin
+							
+									end
+							2'b01: begin
+									end
+							2'b10: begin
+									end
+							2'b11: begin
+									end
+							endcase
+						end
+			4'b0101: begin // ADC *
+							case (state)
+							2'b00: begin
+									end
+							2'b01: begin
+									end
+							2'b10: begin
+									end
+							2'b11: begin
+									end
+							endcase
+						end
+			4'b0110: begin // SBC *
+							case (state)
+							2'b00: begin
+									end
+							2'b01: begin
+									end
+							2'b10: begin
+									end
+							2'b11: begin
+									end
+							endcase
+						end
+			4'b0111: begin // RSC *
+							case (state)
+							2'b00: begin
+									end
+							2'b01: begin
+									end
+							2'b10: begin
+									end
+							2'b11: begin
+									end
+							endcase
+						end
+			4'b1000: begin // TST
+							case (state)
+							2'b00: begin
+									end
+							2'b01: begin
+									end
+							2'b10: begin
+									end
+							2'b11: begin
+									end
+							endcase
+						end
+			4'b1001: begin// TEQ
+							case (state)
+							2'b00: begin
+									end
+							2'b01: begin
+									end
+							2'b10: begin
+									end
+							2'b11: begin
+									end
+							endcase
+						end
+			4'b1010: begin// CMP
+							case (state)
+							2'b00: begin
+									end
+							2'b01: begin
+									end
+							2'b10: begin
+									end
+							2'b11: begin
+									end
+							endcase
+						end
+			4'b1011: begin// CMN
+							case (state)
+							2'b00: begin
+									end
+							2'b01: begin
+									end
+							2'b10: begin
+									end
+							2'b11: begin
+									end
+							endcase
+						end
+			4'b1100: begin // ORR *
+							case (state)
+							2'b00: begin
+									end
+							2'b01: begin
+									end
+							2'b10: begin
+									end
+							2'b11: begin
+									end
+							endcase
+						end
+			4'b1101: begin// MOV
+							case (state)
+							2'b00: begin
+									end
+							2'b01: begin
+									end
+							2'b10: begin
+									end
+							2'b11: begin
+									end
+							endcase
+						end
+			4'b1110: begin // BIC *
+							case (state)
+							2'b00: begin
+									end
+							2'b01: begin
+									end
+							2'b10: begin
+									end
+							2'b11: begin
+									end
+							endcase
+						end
+			4'b1111: begin // MVN
+							case (state)
+							2'b00: begin
+									end
+							2'b01: begin
+									end
+							2'b10: begin
+									end
+							2'b11: begin
+									end
+							endcase
+						end
+			endcase
 	end
 endmodule
