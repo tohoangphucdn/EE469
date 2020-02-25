@@ -14,16 +14,22 @@
 */
 module decode(
 	input wire [31:0] inst,
-	output wire bout,lout, otout, sout
+	output wire bout,lout, otout, sout, ldr, str, p, u, bit, w,
 	output wire [23:0] offset,
 	output wire [3:0] cond, op, rn, rd, rm,
-	output wire [11:0] operand
+	output wire [11:0] operand,
+	output wire [31:0] branchimm
 	);
 	
-	reg [3:0] rn_temp, rd_temp, rm_temp, r1_temp, r2_temp, type;
+	reg [3:0] rn_temp, rd_temp, rm_temp, r1_temp, r2_temp;
+	reg [2:0] type;
 	reg optype;
 	reg b, l;
+	reg ldr_temp, str_temp;
 
+	assign branchimm[31:26] = {6{inst[23]}};
+   assign branchimm[25:2] = inst[23:0];
+   assign branchimm[1:0] = 2'b00;
 	assign cond = inst[31:28];
 	assign op = inst[24:21];
 	assign operand = inst[11:0];
@@ -31,33 +37,42 @@ module decode(
 	assign sout = inst[20];
 	assign offset = inst[23:0];
 	
+	// STR LDR exclusive
+	assign p = inst[24];
+	assign u = inst[23];
+	assign bit = inst[22];
+	assign w = inst[21];
   
-	assign rn = rn_temp;
-	assign rd = rd_temp;
-	assign rm = rm_temp;
+	assign rn = inst[19:16];
+	assign rd = inst[15:12];
+	assign rm = inst[3:0];
 	assign bout = b;
 	assign lout = l;
+	assign ldr = ldr_temp;
+	assign str = str_temp;
 	
 	always @ ( * ) begin
-		type = inst[27:24];
+		
+		type = inst[27:26];
+		b = 1'b0; l = 1'b0; ldr_temp = 1'b0; str_temp = 1'b0;
 		rn_temp = 4'b0; rd_temp = 4'b0; rm_temp = 4'b0;
 		case (type)
-			4'b1010: begin 
-							b = 1'b1; 
-							l = 1'b0; 						
+			2'b00: begin
+						rn_temp = inst[19:16];
+						rd_temp = inst[15:12];
+						rm_temp = inst[3:0];
+					end	
+			2'b01: begin
+						ldr_temp = inst[20];
+						str_temp = ~inst[20];
+						
+					end
+			default: begin
+							b = 1'b1;
+							if (inst[24]) l = 1'b1;
+							else l = 1'b0;
 						end
-			4'b1011: begin 
-							b = 1'b1; 
-							l = 1'b1; 
-						end
-			default: begin		
-							b = 1'b0;
-							l = 1'b0;
-							rn_temp = inst[19:16];
-							rd_temp = inst[15:12];
-							rm_temp = inst[3:0];
-						end
-		endcase		
+		endcase
 	end
 endmodule
 
