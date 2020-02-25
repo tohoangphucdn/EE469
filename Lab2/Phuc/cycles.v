@@ -28,6 +28,12 @@ module cycles(
 	wire [3:0] newcond;
 	reg condition;
 	
+	// Temporary variables
+	reg [31:0] tregaddrIn, tregaddrOut1, tregaddrOut2, tregdataIn;
+	reg tregwr, tregrd1, tregrd2;
+	reg [31:0] tmemaddrIn, tmemaddrOut, tmemdataIn;
+	reg tmemwr, tmemrd;
+	
 //	assign regaddrIn 		= 0;
 //	assign regaddrOut1 	= 0;
 //	assign regaddrOut2 	= 0;
@@ -92,40 +98,60 @@ module cycles(
 	
 	// Cycling through the states of the operations
 	always @(*) begin
-		regaddrIn = 0; regaddrOut1 = 0; regaddrOut2 = 0; regdataIn = 0;
-		regwr = 0; regrd1 = 0; regrd2 = 0; 
-		memaddrIn = 0; memaddrOut = 0; memdataIn = 0; 
-		memwr = 0; memrd = 0; 
+		tregaddrIn = 0; tregaddrOut1 = 0; tregaddrOut2 = 0; tregdataIn = 0;
+		tregwr = 0; tregrd1 = 0; tregrd2 = 0; 
+		tmemaddrIn = 0; tmemaddrOut = 0; tmemdataIn = 0; 
+		tmemwr = 0; tmemrd = 0; 
 		if (ldr || str) begin
 			case (state)
 				2'b00: begin
 				  //  fetch in main
 						end
 				2'b01: begin
-				  // read rekkgister file
+				  // read register file
 							if (ldr) begin
-								memaddrOut = rm;
-								memrd = 1'b1;
+								tregaddrOut1 = rn;
+								tregrd1 = 1'b1;
 							end
 							else begin
-								regaddrOut1 = rm;
-								regrd1 = 1'b1;
+								tregaddrOut1 = rd;
+								tregrd1 = 1'b1;
 							end
+							
 						end
 				2'b10: begin
-				  // shift
+							if (ldr) begin
+								if (p) tmemaddrOut = regdata1 + operand;
+								else tmemaddrOut = regdata1;
+								tmemrd = 1'b1;
+							end
+							else begin
+								tregaddrOut2 = rn;
+								tregrd2 = 1'b1;
+							end
 						end
 				2'b11: begin
 				  // push and output
 							if (ldr) begin
-								regaddrIn = rd;
-								regwr = 1'b1;
-								regdataIn = memdata;
+								tregaddrIn = rd;
+								tregwr = 1'b1;
+								if (bit) tregdataIn = {24'b0, memdata[7:0]};
+								else tregdataIn = memdata;
 							end
 							else begin
-								memaddrIn = rd;
-								memwr = 1'b1;
-								memdataIn = regdata1;
+								if (p) tmemaddrIn = regdata1 + operand;
+								else tmemaddrIn = regdata1;
+								tmemwr = 1'b1;
+								
+								if (bit) tmemdataIn = {4{regdata2[7:0]}};
+								else tmemdataIn = regdata2;
+								
+								if (w) begin
+									tregaddrIn = rn;
+									if (u)										
+										tregdataIn = regdata1 + operand;
+									else tregdataIn = regdata1 - operand;
+								end
 							end
 						end
 				endcase
