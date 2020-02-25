@@ -156,10 +156,20 @@ module cycles(
 								2'b00: begin
 										end
 								2'b01: begin
+											regaddrOut1 = rn; regrd1 = 1;
+											alu1 = rn; // send to ALU
+											if (t) begin
+												alu2 = operand // send to ALU
+											end else begin
+												regaddrOut2 = rm; regrd2 = 1;
+												alu2 = rm; // send to ALU
+											end
 										end
 								2'b10: begin
 										end
 								2'b11: begin
+											regaddrIn = rd; regwr = 1;
+											regdataIn = result;
 										end
 								endcase
 							end
@@ -169,12 +179,12 @@ module cycles(
 										end
 								2'b01: begin
 											regaddrOut1 = rn; regrd1 = 1;
-											alu1 = rn;
+											alu1 = rn; // send to ALU
 											if (t) begin
-												alu2 = operand
+												alu2 = operand // send to ALU
 											end else begin
 												regaddrOut2 = rm; regrd2 = 1;
-												alu2 = rm;
+												alu2 = rm; // send to ALU
 											end
 										end
 								2'b10: begin
@@ -203,12 +213,12 @@ module cycles(
 										end
 								2'b01: begin
 											regaddrOut1 = rn; regrd1 = 1;
-											alu1 = rn;
+											alu1 = rn; // send to ALU
 											if (t) begin
-												alu2 = operand
+												alu2 = operand // send to ALU
 											end else begin
 												regaddrOut2 = rm; regrd2 = 1;
-												alu2 = rm;
+												alu2 = rm; // send to ALU
 											end
 										end
 								2'b10: begin
@@ -261,12 +271,12 @@ module cycles(
 										end
 								2'b01: begin
 											regaddrOut1 = rn; regrd1 = 1;
-											alu1 = rn;
+											alu1 = rn; // send to ALU
 											if (t) begin
-												alu2 = operand
+												alu2 = operand // send to ALU
 											end else begin
 												regaddrOut2 = rm; regrd2 = 1;
-												alu2 = rm;
+												alu2 = rm; // send to ALU
 											end
 										end
 								2'b10: begin
@@ -281,12 +291,12 @@ module cycles(
 										end
 								2'b01: begin
 											regaddrOut1 = rn; regrd1 = 1;
-											alu1 = rn;
+											alu1 = rn; // send to ALU
 											if (t) begin
-												alu2 = operand
+												alu2 = operand // send to ALU
 											end else begin
 												regaddrOut2 = rm; regrd2 = 1;
-												alu2 = rm;
+												alu2 = rm; // send to ALU
 											end
 										end
 								2'b10: begin
@@ -300,6 +310,14 @@ module cycles(
 								2'b00: begin
 										end
 								2'b01: begin
+											regaddrOut1 = rn; regrd1 = 1;
+											alu1 = rn; // send to ALU
+											if (t) begin
+												alu2 = operand // send to ALU
+											end else begin
+												regaddrOut2 = rm; regrd2 = 1;
+												alu2 = rm; // send to ALU
+											end
 										end
 								2'b10: begin
 										end
@@ -324,10 +342,20 @@ module cycles(
 								2'b00: begin
 										end
 								2'b01: begin
+											regaddrOut1 = rn; regrd1 = 1;
+											alu1 = rn; // send to ALU
+											if (t) begin
+												alu2 = operand // send to ALU
+											end else begin
+												regaddrOut2 = rm; regrd2 = 1;
+												alu2 = rm; // send to ALU
+											end
 										end
 								2'b10: begin
 										end
 								2'b11: begin
+											regaddrIn = rd; regwr = 1;
+											regdataIn = result;
 										end
 								endcase
 							end
@@ -336,10 +364,19 @@ module cycles(
 								2'b00: begin
 										end
 								2'b01: begin
+											alu1 = rd; // send to ALU
+											if (t) begin
+												alu2 = operand // send to ALU
+											end else begin
+												regaddrOut1 = rm; regrd1 = 1;
+												alu2 = rm; // send to ALU
+											end
 										end
 								2'b10: begin
 										end
 								2'b11: begin
+											regaddrIn = rd; regwr = 1;
+											regdataIn = result;
 										end
 								endcase
 							end
@@ -348,10 +385,20 @@ module cycles(
 								2'b00: begin
 										end
 								2'b01: begin
+											regaddrOut1 = rn; regrd1 = 1;
+											alu1 = rn; // send to ALU
+											if (t) begin
+												alu2 = operand // send to ALU
+											end else begin
+												regaddrOut2 = rm; regrd2 = 1;
+												alu2 = rm; // send to ALU
+											end
 										end
 								2'b10: begin
 										end
 								2'b11: begin
+											regaddrIn = rd; regwr = 1;
+											regdataIn = result;
 										end
 								endcase
 							end
@@ -360,10 +407,19 @@ module cycles(
 								2'b00: begin
 										end
 								2'b01: begin
+											alu1 = rd;
+											if (t) begin
+												alu2 = operand // send to ALU
+											end else begin
+												regaddrOut1 = rm; regrd1 = 1;
+												alu2 = rm; // send to ALU
+											end
 										end
 								2'b10: begin
 										end
 								2'b11: begin
+											regaddrIn = rd; regwr = 1;
+											regdataIn = result;
 										end
 								endcase
 							end
