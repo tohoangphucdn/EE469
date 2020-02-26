@@ -1,3 +1,13 @@
+/* Rotate immediate value
+
+	Input:
+		rotate_amount	: 4-bit rotating amount
+		value				: 8-bit rotating value
+	
+	Output:
+		out_rotate		: 32-bit rotated value
+		c_flag: carried-out bit
+*/
 module rotate ( 
 	input wire [3:0] rotate_amount, 
 	input wire [7:0] value,

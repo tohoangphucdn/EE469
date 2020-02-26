@@ -1,3 +1,41 @@
+/*	Control the input and utilization of memory and register file
+
+	Input:
+		clk							: clock signal
+		pc								: 32-bit program counter
+		state							: 2-bit value corresponding to 4 phases
+		op								: 4-bit opcode of operations
+		b								: branch signal
+		l								: branch link signakl
+		t								: type of operand, 1 if value and 0 if register
+		s								: condition modifying signal
+		ldr/str						:	load/store signal
+		p								: pre/post indexing style
+		u								: offset increment/decrement, 1 if increment, 0 otherwise
+		bit							: 1 if load/store is bit, 0 if word
+		w								: 1 if ldr/str write back to register, 0 otherwise
+		offset						: 24-bit offset for branch
+		cond, rn, rd, rm			: 4-bit condition code - rn - rd - rm
+		operand						: 12-bit operand
+		regdata1, regdata2		: 32-bit output data from reg file
+		memdata						: 32-bit output data from memory
+		
+	Output:
+		regaddrIn					: 4-bit input address for reg file
+		regaddrOut1, regaddrOut2: 32-bit output addresses for reg file
+		regdataIn					: 32-bit input data for reg file
+		regwr							: write signal for reg file
+		regrd1, regrd2				: read signals for reg file
+		
+		memaddrIn					: 32-bit input address for memory
+		memaddrOut					: 32-bit output address for memory
+		memdataIn					: 32-bit input data for memory
+		memwr							: write signal for mem file
+		memrd							: read signals for memory
+		
+		bf								: branch flag, 1 if branch, 0 otherwise
+		
+*/
 module cycles(
 	input wire clk,
 	input wire [31:0] pc,
@@ -10,12 +48,12 @@ module cycles(
 	input wire [31:0] regdata1, regdata2, memdata,
 	
 	
-	output wire [31:0] regaddrIn, regaddrOut1, regaddrOut2, regdataIn,
+	output wire [3:0] regaddrIn, 
+	output wire [31:0] regaddrOut1, regaddrOut2, regdataIn,
 	output wire regwr, regrd1, regrd2,
 	output wire [31:0] memaddrIn, memaddrOut, memdataIn,
 	output wire memwr, memrd,
-	output wire bf,
-	output wire [31:0] branchimm 
+	output wire bf
 	);
 	
 	// t = 0 => operand is register
@@ -33,7 +71,8 @@ module cycles(
 	wire c_flag, c_flag2;
 	
 	// Temporary variables
-	reg [31:0] tregaddrIn, tregaddrOut1, tregaddrOut2, tregdataIn;
+	reg [3:0] tregaddrIn; 
+	reg [31:0] tregaddrOut1, tregaddrOut2, tregdataIn;
 	reg tregwr, tregrd1, tregrd2;
 	reg [31:0] tmemaddrIn, tmemaddrOut, tmemdataIn;
 	reg tmemwr, tmemrd;
