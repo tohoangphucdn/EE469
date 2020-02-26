@@ -5,7 +5,7 @@ module rotate (
 	output wire c_flag
 	);
 	
-	reg [7:0] out;
+	reg [31:0] out;
 	wire [31:0] temp_value;
 	wire [4:0] true_rot;
 	
