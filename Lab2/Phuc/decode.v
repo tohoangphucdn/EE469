@@ -103,12 +103,13 @@ endmodule
 module decode_testbench();
 	reg clk;	
 	reg [31:0] inst;
-	wire bout, lout, otout;
+	wire bout,lout, otout, sout, ldr, str, p, u, bit, w;
 	wire [31:0] offset;
 	wire [3:0] cond, op, rn, rd, rm;
 	wire [11:0] operand;
+	wire [31:0] branchimm;
 
-	decode dut(inst, bout, lout, otout, offset, cond, op, rn, rd, rm, operand);
+	decode dut(inst, bout,lout, otout, sout, ldr, str, p, u, bit, w, offset, cond, op, rn, rd, rm, operand, branchimm);
 
 	// Set up the clock.
 	always begin
