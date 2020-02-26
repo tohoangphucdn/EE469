@@ -65,7 +65,7 @@ module cpu(
 		else begin
 			if (state == 2'b11) begin
 				if (!bf) pc <= pc + 1;
-				else pc <= pc + branchimm;
+				else pc <= pc + ((branchimm + 4'b1000) >> 2);
 				state <= 2'b00;
 			end
 			else state <= state + 1;
@@ -107,6 +107,6 @@ module cpu_testbench();
 	initial begin
 						#10;
 		nreset <= 0;	#10;
-		nreset <= 1; #200;
+		nreset <= 1; #700;
   end
 endmodule

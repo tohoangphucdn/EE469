@@ -191,18 +191,18 @@ module cycles(
 								else tregdataIn = memdata;
 							end
 							else begin
-								if (p) tmemaddrIn = regdata1 + operand;
-								else tmemaddrIn = regdata1;
+								if (p) tmemaddrIn = regdata2 + operand;
+								else tmemaddrIn = regdata2;
 								tmemwr = 1'b1;
 								
-								if (bit) tmemdataIn = {4{regdata2[7:0]}};
-								else tmemdataIn = regdata2;
+								if (bit) tmemdataIn = {4{regdata1[7:0]}};
+								else tmemdataIn = regdata1;
 								
 								if (w) begin
 									tregaddrIn = rn;
 									if (u)										
-										tregdataIn = regdata1 + operand;
-									else tregdataIn = regdata1 - operand;
+										tregdataIn = regdata2 + operand;
+									else tregdataIn = regdata2 - operand;
 								end
 							end
 						end
@@ -217,6 +217,7 @@ module cycles(
 						//register file connection
 						tregaddrIn = 31'b1110; //if there is BL, store to register 14
 						tregdataIn = pc; //connect to pc
+						twr = 1'b1;
 					end
 				end
 			end
