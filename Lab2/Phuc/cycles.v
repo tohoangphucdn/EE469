@@ -23,10 +23,13 @@ module cycles(
 	// call ALU(op, value1, value2, results, cpsr)
 	// not use ALU => op = 4'b0
 	
-	reg [31:0] cpsr, alu1, alu2;
+	reg [31:0]  alu1, alu2,cpsr;
+	wire [31:0] ALUresult;
 	wire [31:0] result;
+	reg [3:0] opcode;
 	wire [3:0] newcond;
-	reg condition;
+	reg [3:0]temp;
+	reg condition, tbf;
 	
 	// Temporary variables
 	reg [31:0] tregaddrIn, tregaddrOut1, tregaddrOut2, tregdataIn;
@@ -34,21 +37,20 @@ module cycles(
 	reg [31:0] tmemaddrIn, tmemaddrOut, tmemdataIn;
 	reg tmemwr, tmemrd;
 	
-//	assign regaddrIn 		= 0;
-//	assign regaddrOut1 	= 0;
-//	assign regaddrOut2 	= 0;
-//	assign regdataIn 		= 0;
-//	assign regwr 			= 0;
-//	assign regrd1 			= 0;
-//	assign regrd2 			= 0;
-//	assign memaddrIn 		= 0;
-//	assign memaddrOut 	= 0;
-//	assign memdataIn 		= 0;
-//	assign memwr 			= 0;
-//	assign memrd 			= 0;
-//	assign bf 				= 0;
-//	assign branchimm 		= 0;
-	
+	assign regaddrIn 		= tregaddrIn;
+	assign regaddrOut1 	= tregaddrOut1;
+	assign regaddrOut2 	= tregaddrOut2;
+	assign regdataIn 		= tregdataIn;
+	assign regwr 			= tregwr;
+	assign regrd1 			= tregrd1;
+	assign regrd2 			= tregrd2;
+	assign memaddrIn 		= tmemaddrIn;
+	assign memaddrOut 	= tmemaddrOut;
+	assign memdataIn 		= tmemdataIn;
+	assign memwr 			= tmemwr;
+	assign memrd 			= tmemrd;
+	assign bf 				= tbf;
+
 	//conditions
 	localparam EQcc = 4'b0000;
 	localparam NEcc = 4'b0001;
@@ -90,11 +92,13 @@ module cycles(
 	
 	
 	// ALU calls
-	ALU calculation(opcode, alu1, alu2, result, newcond);
+	ALU calculation(opcode, alu1, alu2, ALUresult, newcond[3], newcond[2], newcond[1], newcond[0]);
 	
 	// Altering CPSR
-	always @(*) 
-		if (s) cpsr[31:28] = newcond;
+	initial cpsr = 0;
+	always @(*) begin
+		if (s) cpsr = {newcond,cpsr[27:0]};
+	end
 	
 	// Cycling through the states of the operations
 	always @(*) begin
@@ -102,8 +106,11 @@ module cycles(
 		tregwr = 0; tregrd1 = 0; tregrd2 = 0; 
 		tmemaddrIn = 0; tmemaddrOut = 0; tmemdataIn = 0; 
 		tmemwr = 0; tmemrd = 0; 
+		opcode = 0; alu1 = 0; alu2 = 0;
+		tbf = 0;
 		if (ldr || str) begin
-			case (state)
+			if (condition) begin
+				case (state)
 				2'b00: begin
 				  //  fetch in main
 						end
@@ -155,9 +162,18 @@ module cycles(
 							end
 						end
 				endcase
+			end
 		end
 		else begin
 			if (b) begin
+				if (condition) begin
+					tbf = 1'b1;
+					if (l) begin
+						//register file connection
+						tregaddrIn = 31'b1110; //if there is BL, store to register 14
+						tregdataIn = pc; //connect to pc
+					end
+				end
 			end
 			else
 				case (op)
@@ -182,10 +198,21 @@ module cycles(
 								2'b00: begin
 										end
 								2'b01: begin
+											tregaddrOut1 = rn; tregrd1 = 1;
+											alu1 = regdata1; // send to ALU
+											if (t) begin
+												alu2 = operand; // send to ALU
+											end 
+											else begin
+												tregaddrOut2 = rm; tregrd2 = 1;
+												alu2 = regdata2; // send to ALU
+											end
 										end
 								2'b10: begin
 										end
 								2'b11: begin
+											tregaddrIn = rd; tregwr = 1;
+											tregdataIn = ALUresult;
 										end
 								endcase
 							end
@@ -194,10 +221,20 @@ module cycles(
 								2'b00: begin
 										end
 								2'b01: begin
+											tregaddrOut1 = rn; tregrd1 = 1;
+											alu1 = regdata1; // send to ALU
+											if (t) begin
+												alu2 = operand; // send to ALU
+											end else begin
+												tregaddrOut2 = rm; tregrd2 = 1;
+												alu2 = regdata2; // send to ALU
+											end
 										end
 								2'b10: begin
 										end
 								2'b11: begin
+											tregaddrIn = rd; tregwr = 1;
+											tregdataIn = ALUresult;
 										end
 								endcase
 							end
@@ -216,13 +253,22 @@ module cycles(
 				4'b0100: begin // ADD *
 								case (state)
 								2'b00: begin
-								
 										end
 								2'b01: begin
+											tregaddrOut1 = rn; tregrd1 = 1;
+											alu1 = regdata1; // send to ALU
+											if (t) begin
+												alu2 = operand; // send to ALU
+											end else begin
+												tregaddrOut2 = rm; tregrd2 = 1;
+												alu2 = regdata2; // send to ALU
+											end
 										end
 								2'b10: begin
 										end
 								2'b11: begin
+											tregaddrIn = rd; tregwr = 1;
+											tregdataIn = result;
 										end
 								endcase
 							end
@@ -267,10 +313,20 @@ module cycles(
 								2'b00: begin
 										end
 								2'b01: begin
+											tregaddrOut1 = rn; tregrd1 = 1;
+											alu1 = regdata1; // send to ALU
+											if (t) begin
+												alu2 = operand; // send to ALU
+											end else begin
+												tregaddrOut2 = rm; tregrd2 = 1;
+												alu2 = regdata2; // send to ALU
+											end
 										end
 								2'b10: begin
 										end
 								2'b11: begin
+											tregaddrIn = rd; tregwr = 1;
+											tregdataIn = ALUresult;
 										end
 								endcase
 							end
@@ -279,6 +335,14 @@ module cycles(
 								2'b00: begin
 										end
 								2'b01: begin
+											tregaddrOut1 = rn; tregrd1 = 1;
+											alu1 = regdata1; // send to ALU
+											if (t) begin
+												alu2 = operand; // send to ALU
+											end else begin
+												tregaddrOut2 = rm; tregrd2 = 1;
+												alu2 = regdata2; // send to ALU
+											end
 										end
 								2'b10: begin
 										end
@@ -291,6 +355,14 @@ module cycles(
 								2'b00: begin
 										end
 								2'b01: begin
+											tregaddrOut1 = rn; tregrd1 = 1;
+											alu1 = regdata1; // send to ALU
+											if (t) begin
+												alu2 = operand; // send to ALU
+											end else begin
+												tregaddrOut2 = rm; tregrd2 = 1;
+												alu2 = regdata2; // send to ALU
+											end
 										end
 								2'b10: begin
 										end
@@ -315,10 +387,20 @@ module cycles(
 								2'b00: begin
 										end
 								2'b01: begin
+											tregaddrOut1 = rn; tregrd1 = 1;
+											alu1 = regdata1; // send to ALU
+											if (t) begin
+												alu2 = operand; // send to ALU
+											end else begin
+												tregaddrOut2 = rm; tregrd2 = 1;
+												alu2 = regdata2; // send to ALU
+											end
 										end
 								2'b10: begin
 										end
 								2'b11: begin
+											tregaddrIn = rd; tregwr = 1;
+											tregdataIn = ALUresult;
 										end
 								endcase
 							end
@@ -327,10 +409,18 @@ module cycles(
 								2'b00: begin
 										end
 								2'b01: begin
+											tregaddrOut1 = rm; tregrd1 = 1;
+											
+											//enable the ALU for the work
+											opcode = 4'b1101;
+											alu1 = rd; //MOV to the destination register
+											alu2 = regdata1; //operand 2					
 										end
 								2'b10: begin
 										end
-								2'b11: begin
+								2'b11: begin 
+											tregaddrIn = rd; tregwr = 1;
+											tregdataIn = ALUresult;
 										end
 								endcase
 							end
@@ -339,10 +429,18 @@ module cycles(
 								2'b00: begin
 										end
 								2'b01: begin
+											tregaddrOut1 = rm; tregrd1 = 1;
+											tregaddrOut2 = rn; tregrd2 = 1;
+											
+											opcode = 4'b1110;
+											alu1 = regdata1;
+											alu2 = regdata2;
 										end
 								2'b10: begin
 										end
 								2'b11: begin
+											tregaddrIn = rd; tregwr = 1;
+											tregdataIn = ALUresult;
 										end
 								endcase
 							end
@@ -351,10 +449,18 @@ module cycles(
 								2'b00: begin
 										end
 								2'b01: begin
+											tregaddrOut1 = rm; tregrd1 = 1;
+											
+											//enable the ALU for the work
+											opcode = 4'b1111;
+											alu1 = rd; //MVN to the destination register
+											alu2 = regdata1; //operand 2					
 										end
 								2'b10: begin
 										end
 								2'b11: begin
+											tregaddrIn = rd; tregwr = 1;
+											tregdataIn = ALUresult;
 										end
 								endcase
 							end
