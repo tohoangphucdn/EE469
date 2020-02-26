@@ -109,7 +109,7 @@ module decode_testbench();
 	wire [11:0] operand;
 	wire [31:0] branchimm;
 
-	decode dut(inst, bout,lout, otout, sout, ldr, str, p, u, bit, w, offset, cond, op, rn, rd, rm, operand, branchimm);
+	decode dut(inst, bout, lout, otout, sout, ldr, str, p, u, bit, w, offset, cond, op, rn, rd, rm, operand, branchimm);
 
 	// Set up the clock.
 	always begin
