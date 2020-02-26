@@ -1,5 +1,4 @@
 /*	Control the input and utilization of memory and register file
-
 	Input:
 		clk							: clock signal
 		pc								: 32-bit program counter
@@ -49,7 +48,8 @@ module cycles(
 	
 	
 	output wire [3:0] regaddrIn, 
-	output wire [31:0] regaddrOut1, regaddrOut2, regdataIn,
+	output wire [3:0] regaddrOut1, regaddrOut2, 
+	output wire [31:0] regdataIn,
 	output wire regwr, regrd1, regrd2,
 	output wire [31:0] memaddrIn, memaddrOut, memdataIn,
 	output wire memwr, memrd,
@@ -63,7 +63,6 @@ module cycles(
 	
 	reg [31:0]  alu1, alu2,cpsr;
 	wire [31:0] ALUresult, out_shift, out_rotate;
-	wire [31:0] result;
 	reg [3:0] opcode;
 	wire [3:0] newcond;
 	reg [3:0]temp;
@@ -245,20 +244,21 @@ module cycles(
 										end
 								2'b01: begin
 											tregaddrOut1 = rn; tregrd1 = 1;
-											alu1 = regdata1; // send to ALU
-											if (t) begin
-												alu2 = out_rotate; // send to ALU
-											end 
-											else begin
+											if (!t) begin
 												tregaddrOut2 = rm; tregrd2 = 1;
-												alu2 = out_shift; // send to ALU
 											end
 										end
 								2'b10: begin
-										end
-								2'b11: begin
+											opcode = 4'b0001;
+											alu1 = regdata1; // send to ALU
+											if (t) alu2 = out_rotate; // send to ALU
+											else alu2 = out_shift; // send to 
+											
 											tregaddrIn = rd; tregwr = 1;
 											tregdataIn = ALUresult;
+										end
+								2'b11: begin
+											
 										end
 								endcase
 							end
@@ -268,19 +268,20 @@ module cycles(
 										end
 								2'b01: begin
 											tregaddrOut1 = rn; tregrd1 = 1;
-											alu1 = regdata1; // send to ALU
-											if (t) begin
-												alu2 = out_rotate; // send to ALU
-											end else begin
+											if (!t) begin
 												tregaddrOut2 = rm; tregrd2 = 1;
-												alu2 = out_shift; // send to ALU
 											end
 										end
 								2'b10: begin
-										end
-								2'b11: begin
+											opcode = 4'b0010;
+											alu1 = regdata1; // send to ALU
+											if (t) alu2 = out_rotate; // send to ALU
+											else alu2 = out_shift; // send to ALU
+											
 											tregaddrIn = rd; tregwr = 1;
 											tregdataIn = ALUresult;
+										end
+								2'b11: begin
 										end
 								endcase
 							end
@@ -302,19 +303,20 @@ module cycles(
 										end
 								2'b01: begin
 											tregaddrOut1 = rn; tregrd1 = 1;
-											alu1 = regdata1; // send to ALU
-											if (t) begin
-												alu2 = out_rotate; // send to ALU
-											end else begin
+											if (!t) begin
 												tregaddrOut2 = rm; tregrd2 = 1;
-												alu2 = out_shift; // send to ALU
 											end
 										end
-								2'b10: begin
+								2'b10: begin	
+											opcode = 4'b0100;
+											alu1 = regdata1; // send to ALU
+											if (t) alu2 = out_rotate; // send to ALU
+											else alu2 = out_shift; // send to ALU
+											
+											tregaddrIn = rd; tregwr = 1;
+											tregdataIn = ALUresult;
 										end
 								2'b11: begin
-											tregaddrIn = rd; tregwr = 1;
-											tregdataIn = result;
 										end
 								endcase
 							end
@@ -360,19 +362,20 @@ module cycles(
 										end
 								2'b01: begin
 											tregaddrOut1 = rn; tregrd1 = 1;
-											alu1 = regdata1; // send to ALU
-											if (t) begin
-												alu2 = out_rotate; // send to ALU
-											end else begin
+											if (!t) begin
 												tregaddrOut2 = rm; tregrd2 = 1;
-												alu2 = out_shift; // send to ALU
 											end
 										end
 								2'b10: begin
-										end
-								2'b11: begin
+											opcode = 4'b1000;											
+											alu1 = regdata1; // send to ALU
+											if (t) alu2 = out_rotate; // send to ALU
+											else alu2 = out_shift; // send to ALU
+											
 											tregaddrIn = rd; tregwr = 1;
 											tregdataIn = ALUresult;
+										end
+								2'b11: begin
 										end
 								endcase
 							end
@@ -382,15 +385,15 @@ module cycles(
 										end
 								2'b01: begin
 											tregaddrOut1 = rn; tregrd1 = 1;
-											alu1 = regdata1; // send to ALU
-											if (t) begin
-												alu2 = out_rotate; // send to ALU
-											end else begin
+											if (!t) begin
 												tregaddrOut2 = rm; tregrd2 = 1;
-												alu2 = out_shift; // send to ALU
 											end
 										end
 								2'b10: begin
+											opcode = 4'b1001;
+											alu1 = regdata1; // send to ALU
+											if (t) alu2 = out_rotate; // send to ALU
+											else alu2 = out_shift; // send to ALU
 										end
 								2'b11: begin
 										end
@@ -402,15 +405,15 @@ module cycles(
 										end
 								2'b01: begin
 											tregaddrOut1 = rn; tregrd1 = 1;
-											alu1 = regdata1; // send to ALU
-											if (t) begin
-												alu2 = out_rotate; // send to ALU
-											end else begin
+											if (!t) begin
 												tregaddrOut2 = rm; tregrd2 = 1;
-												alu2 = out_shift; // send to ALU
 											end
 										end
 								2'b10: begin
+											opcode = 4'b1010;
+											alu1 = regdata1; // send to ALU
+											if (t) alu2 = out_rotate;
+											else alu2 = out_shift; // send to ALU
 										end
 								2'b11: begin
 										end
@@ -434,19 +437,20 @@ module cycles(
 										end
 								2'b01: begin
 											tregaddrOut1 = rn; tregrd1 = 1;
-											alu1 = regdata1; // send to ALU
-											if (t) begin
-												alu2 = out_rotate; // send to ALU
-											end else begin
+											if (!t) begin
 												tregaddrOut2 = rm; tregrd2 = 1;
-												alu2 = out_shift; // send to ALU
 											end
 										end
 								2'b10: begin
-										end
-								2'b11: begin
+											opcode = 4'b1100;
+											alu1 = regdata1; // send to ALU
+											if (t) alu2 = out_rotate; // send to ALU
+											else alu2 = out_shift; // send to ALU
+											
 											tregaddrIn = rd; tregwr = 1;
 											tregdataIn = ALUresult;
+										end
+								2'b11: begin
 										end
 								endcase
 							end
@@ -455,18 +459,18 @@ module cycles(
 								2'b00: begin
 										end
 								2'b01: begin
-											tregaddrOut1 = rm; tregrd1 = 1;
-											
+											tregaddrOut1 = rm; tregrd1 = 1;	
+										end
+								2'b10: begin
 											//enable the ALU for the work
 											opcode = 4'b1101;
 											alu1 = rd; //MOV to the destination register
-											alu2 = regdata1; //operand 2					
-										end
-								2'b10: begin
-										end
-								2'b11: begin 
+											alu2 = regdata1; //operand 2	
+											
 											tregaddrIn = rd; tregwr = 1;
 											tregdataIn = ALUresult;
+										end
+								2'b11: begin 
 										end
 								endcase
 							end
@@ -477,16 +481,16 @@ module cycles(
 								2'b01: begin
 											tregaddrOut1 = rm; tregrd1 = 1;
 											tregaddrOut2 = rn; tregrd2 = 1;
-											
-											opcode = 4'b1110;
-											alu1 = regdata1;
-											alu2 = regdata2;
 										end
 								2'b10: begin
-										end
-								2'b11: begin
+											opcode = 4'b1110;
+											alu1 = regdata1;
+											alu2 = regdata2;											
+											
 											tregaddrIn = rd; tregwr = 1;
 											tregdataIn = ALUresult;
+										end
+								2'b11: begin
 										end
 								endcase
 							end
@@ -495,18 +499,18 @@ module cycles(
 								2'b00: begin
 										end
 								2'b01: begin
-											tregaddrOut1 = rm; tregrd1 = 1;
-											
+											tregaddrOut1 = rm; tregrd1 = 1;				
+										end
+								2'b10: begin
 											//enable the ALU for the work
 											opcode = 4'b1111;
 											alu1 = rd; //MVN to the destination register
-											alu2 = regdata1; //operand 2					
-										end
-								2'b10: begin
-										end
-								2'b11: begin
+											alu2 = regdata1; //operand 2	
+											
 											tregaddrIn = rd; tregwr = 1;
 											tregdataIn = ALUresult;
+										end
+								2'b11: begin
 										end
 								endcase
 							end
@@ -514,3 +518,69 @@ module cycles(
 		end
 	end
 endmodule
+
+
+module cycle_testbench();
+	reg clk;
+	reg [31:0] pc;
+	reg [1:0] state;
+	reg [3:0] op;
+	reg b, l, t, s, ldr, str, p, u, bit, w;
+	reg [23:0] offset;
+	reg [3:0] cond, rn, rd, rm;
+	reg [11:0] operand;
+	reg [31:0] regdata1, regdata2, memdata;
+	
+	
+	wire [3:0] regaddrIn; 
+	wire [31:0] regaddrOut1, regaddrOut2, regdataIn;
+	wire regwr, regrd1, regrd2;
+	wire [31:0] memaddrIn, memaddrOut, memdataIn;
+	wire memwr, memrd;
+	wire bf;
+	
+	cycles dut(clk, pc, state, op, b, l, t, s, ldr, str, p, u, bit, w, offset, cond, rn, rd, rm, operand, regdata1, regdata2, memdata,
+						 regaddrIn, regaddrOut1, regaddrOut2, regdataIn, regwr, regrd1, regrd2, 
+						 memaddrIn, memaddrOut, memdataIn, memwr, memrd, bf, branchimm); 
+	
+	// Set up the inputs to the design. Each line is a clock cycle.
+	integer i;
+	initial begin
+		
+		//ADD instruction test
+		pc <= 32'h0; cond <= 4'b1110; rn <= 4'b0100; rd <= 4'b0100; rm <= 4'b0001; operand <= 11'b1; 
+		op <= 4'b0100; b <= 0; l <= 0; t <= 1; s <= 1; state <= 2'b00;  #10;
+																									state <= 2'b01;  #10;
+																									state <= 2'b10;  #10;
+																									state <= 2'b11;  #10;
+									
+		//SUB instruction test
+		pc <= 32'h4; cond <= 4'b1110; rn <= 4'b1011; rd <= 4'b1101; rm <= 4'b0000; operand <= 11'b10000; op <= 4'b0010; b <= 0; l <= 0; t <= 1; s <= 0; offset <= 24'b010010111101000000010000; state <= 2'b00;  #10;
+																																																		 state <= 2'b01;  #10;
+																																																		 state <= 2'b10;  #10;
+																																																		 state <= 2'b11;  #10;
+		
+		//B instruction test
+		pc <= 32'h8; cond <= 4'b1110; rn <= 4'b0; rd <= 4'b0; rm <= 4'b0; operand <= 12'b100010101110; op <= 4'b0; b <= 1; l <= 0; t <= 1; s <= 0; offset <= 24'b100010101110; state <= 2'b00;  #10;
+																																																		 state <= 2'b01;  #10;
+																																																		 state <= 2'b10;  #10;
+																																																		 state <= 2'b11;  #10;
+		
+		//BL instruction test
+		pc <= 32'hC; cond <= 4'b1110; rn <= 4'b0; rd <= 4'b0; rm <= 4'b0; operand <= 12'b100000101100 ; op <= 4'b0; b <= 1; l <= 1; t <= 1; s <= 0; offset <= 24'b100010101110; state <= 2'b00;  #10;
+																																																		 state <= 2'b01;  #10;
+																																																		 state <= 2'b10;  #10;
+																																																		 state <= 2'b11;  #10;
+  end
+endmodule
+
+/*
+1110_00_1_0100_0_0100_0100_00000000_0001 (E2844001)
+add r4, r4, #1, 0
+11100010010010111101000000010000 (E24BD010)
+sub sp(r13), fp(r11), #16, 0
+11101010000000000000100010101110 (EA0008AE)
+B 0x0008ae
+11101011000000000011100000101100 (EB00382C)
+BL 0x00382c
+*/

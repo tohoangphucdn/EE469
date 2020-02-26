@@ -15,7 +15,7 @@ module rotate (
 	output wire c_flag
 	);
 	
-	reg [7:0] out;
+	reg [31:0] out;
 	wire [31:0] temp_value;
 	wire [4:0] true_rot;
 	
@@ -26,7 +26,7 @@ module rotate (
 	
 	always @(*) begin	
 		if (true_rot == 0) out = temp_value;
-		else out = (temp_value >> true_rot) + (temp_value << (32 - true_rot));
+		else out = ((temp_value >> true_rot) + (temp_value << (32 - true_rot)));
 	end
 			
 endmodule

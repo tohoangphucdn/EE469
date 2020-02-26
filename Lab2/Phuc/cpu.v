@@ -14,7 +14,7 @@ module cpu(
 	
 	wire reset;
 	wire [31:0] regdata1, regdata2, memdata;
-	reg [31:0] inst;
+	wire [31:0] inst;
 	reg [31:0] inst_full [100:0];
 	reg [31:0] pc;
 	reg [1:0] state;
@@ -25,9 +25,9 @@ module cpu(
 	wire [23:0] offset;
 	
 	// Reg files and memory controller
-	wire regaddrIn, regaddrOut1, regaddrOut2, regdataIn;
+	wire [3:0] regaddrIn, regaddrOut1, regaddrOut2;
 	wire regwr, regrd1, regrd2, memwr, memrd;
-	wire [31:0] memaddrIn, memaddrOut, memdataIn; 
+	wire [31:0] regdataIn, memaddrIn, memaddrOut, memdataIn; 
 	wire bf;
 	wire [31:0] branchimm; 
 	
@@ -39,10 +39,12 @@ module cpu(
 	initial begin
 		$readmemb("inst.txt", inst_full);
 	end
-
+	
+	assign inst = inst_full[pc];
+	
 	decode decoder(inst, b, l, t, s, ldr, str, p, u, bit, w, offset, cond, op, rn, rd, rm, operand, branchimm);
 
-	cycles operation(clk, pc, state, op, b, l, t, s, offset, cond, rn, rd, rm, operand, regdata1, regdata2, memdata,
+	cycles operation(clk, pc, state, op, b, l, t, s, ldr, str, p, u, bit, w, offset, cond, rn, rd, rm, operand, regdata1, regdata2, memdata,
 						 regaddrIn, regaddrOut1, regaddrOut2, regdataIn, regwr, regrd1, regrd2, 
 						 memaddrIn, memaddrOut, memdataIn, memwr, memrd, bf); 
 	
