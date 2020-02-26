@@ -24,12 +24,13 @@ module cycles(
 	// not use ALU => op = 4'b0
 	
 	reg [31:0]  alu1, alu2,cpsr;
-	wire [31:0] ALUresult;
+	wire [31:0] ALUresult, out_shift, out_rotate;
 	wire [31:0] result;
 	reg [3:0] opcode;
 	wire [3:0] newcond;
 	reg [3:0]temp;
 	reg condition, tbf;
+	wire c_flag, c_flag2;
 	
 	// Temporary variables
 	reg [31:0] tregaddrIn, tregaddrOut1, tregaddrOut2, tregdataIn;
@@ -90,6 +91,12 @@ module cycles(
 		endcase
 	end
 	
+	// Shifter calls
+	
+	shifter shifting (operand[11:4], regdata2, out_shift, c_flag); //carry bit of cpsr
+	
+		
+	rotate rotating(operand[11:8], operand[7:0], out_rotate, c_flag2); //carry bit of cpsr
 	
 	// ALU calls
 	ALU calculation(opcode, alu1, alu2, ALUresult, newcond[3], newcond[2], newcond[1], newcond[0]);
@@ -201,11 +208,11 @@ module cycles(
 											tregaddrOut1 = rn; tregrd1 = 1;
 											alu1 = regdata1; // send to ALU
 											if (t) begin
-												alu2 = operand; // send to ALU
+												alu2 = out_rotate; // send to ALU
 											end 
 											else begin
 												tregaddrOut2 = rm; tregrd2 = 1;
-												alu2 = regdata2; // send to ALU
+												alu2 = out_shift; // send to ALU
 											end
 										end
 								2'b10: begin
@@ -224,10 +231,10 @@ module cycles(
 											tregaddrOut1 = rn; tregrd1 = 1;
 											alu1 = regdata1; // send to ALU
 											if (t) begin
-												alu2 = operand; // send to ALU
+												alu2 = out_rotate; // send to ALU
 											end else begin
 												tregaddrOut2 = rm; tregrd2 = 1;
-												alu2 = regdata2; // send to ALU
+												alu2 = out_shift; // send to ALU
 											end
 										end
 								2'b10: begin
@@ -258,10 +265,10 @@ module cycles(
 											tregaddrOut1 = rn; tregrd1 = 1;
 											alu1 = regdata1; // send to ALU
 											if (t) begin
-												alu2 = operand; // send to ALU
+												alu2 = out_rotate; // send to ALU
 											end else begin
 												tregaddrOut2 = rm; tregrd2 = 1;
-												alu2 = regdata2; // send to ALU
+												alu2 = out_shift; // send to ALU
 											end
 										end
 								2'b10: begin
@@ -316,10 +323,10 @@ module cycles(
 											tregaddrOut1 = rn; tregrd1 = 1;
 											alu1 = regdata1; // send to ALU
 											if (t) begin
-												alu2 = operand; // send to ALU
+												alu2 = out_rotate; // send to ALU
 											end else begin
 												tregaddrOut2 = rm; tregrd2 = 1;
-												alu2 = regdata2; // send to ALU
+												alu2 = out_shift; // send to ALU
 											end
 										end
 								2'b10: begin
@@ -338,10 +345,10 @@ module cycles(
 											tregaddrOut1 = rn; tregrd1 = 1;
 											alu1 = regdata1; // send to ALU
 											if (t) begin
-												alu2 = operand; // send to ALU
+												alu2 = out_rotate; // send to ALU
 											end else begin
 												tregaddrOut2 = rm; tregrd2 = 1;
-												alu2 = regdata2; // send to ALU
+												alu2 = out_shift; // send to ALU
 											end
 										end
 								2'b10: begin
@@ -358,10 +365,10 @@ module cycles(
 											tregaddrOut1 = rn; tregrd1 = 1;
 											alu1 = regdata1; // send to ALU
 											if (t) begin
-												alu2 = operand; // send to ALU
+												alu2 = out_rotate; // send to ALU
 											end else begin
 												tregaddrOut2 = rm; tregrd2 = 1;
-												alu2 = regdata2; // send to ALU
+												alu2 = out_shift; // send to ALU
 											end
 										end
 								2'b10: begin
@@ -390,10 +397,10 @@ module cycles(
 											tregaddrOut1 = rn; tregrd1 = 1;
 											alu1 = regdata1; // send to ALU
 											if (t) begin
-												alu2 = operand; // send to ALU
+												alu2 = out_rotate; // send to ALU
 											end else begin
 												tregaddrOut2 = rm; tregrd2 = 1;
-												alu2 = regdata2; // send to ALU
+												alu2 = out_shift; // send to ALU
 											end
 										end
 								2'b10: begin
