@@ -14,7 +14,7 @@ module cycles(
 	output wire regwr, regrd1, regrd2,
 	output wire [31:0] memaddrIn, memaddrOut, memdataIn,
 	output wire memwr, memrd,
-	output wire bf,
+	output wire b_flag,
 	output wire [31:0] branchimm 
 	);
 	
@@ -164,8 +164,8 @@ module cycles(
 										regaddrOut2 = rn; regrd2 = 1;
 										
 										opcode = 4'b0001;
-										alu1 = rm;
-										alu2 = rn;
+										alu1 = rn;
+										alu2 = rm;
 										
 										end
 								2'b10: begin
@@ -338,8 +338,8 @@ module cycles(
 										regaddrOut2 = rn; regrd2 = 1;
 										
 										opcode = 4'b1110;
-										alu1 = rm;
-										alu2 = rn;
+										alu1 = rn;
+										alu2 = rm;
 										end
 								2'b10: begin
 										end
@@ -355,6 +355,17 @@ module cycles(
 										end
 								2'b01: begin
 										regaddrOut1 = rm; regrd1 = 1;
+										
+										//shifted register
+										if (t == 0) begin 
+											shift = operand[11:4];
+											rm = operand[3:0];
+										end
+										else begin
+											rotate = operand[11:8];
+											Imm = operand[7:0];
+										end
+						
 										
 										//enable the ALU for the work
 										opcode = 4'b1111;
@@ -372,4 +383,11 @@ module cycles(
 				endcase
 		end
 	end
+	reg wire [31:0] out_shift;
+	shifter shifting(.shift(shift), .rm(rm), .out(out_shift), .c_flag(cpsr[31])); //carry bit of cpsr
+	//rotate rotating(rotate, rm, out_rotate, cpsr[31]); //carry bit of cpsr
+	
 endmodule
+
+
+
