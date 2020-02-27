@@ -1,3 +1,16 @@
+/* ALU function
+	
+	Input:
+		ALUop		: 4-bit ALU opcode
+		oprd1		: operand #1
+		oprd2		: operand #2
+	
+	Output:
+		result	: result of the calculation
+		negative	: 1 if the result is negative, 0 if positive
+		zero		: 1 if the result is 0, 0 otherwise
+		overflow	: 1 if the calculation overflew, 0 otherwise
+*/
 module ALU #(parameter width = 32)(
 
 	input [3:0] ALUop, //4 bit opcode
@@ -9,7 +22,7 @@ module ALU #(parameter width = 32)(
 	output reg negative,
 	output reg zero,
 	output reg carry_bit,
-	output reg overflow,
+	output reg overflow
 	);
 
 
