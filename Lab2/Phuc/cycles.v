@@ -217,7 +217,7 @@ module cycles(
 						//register file connection
 						tregaddrIn = 31'b1110; //if there is BL, store to register 14
 						tregdataIn = pc; //connect to pc
-						twr = 1'b1;
+						tregwr = 1'b1;
 					end
 				end
 			end
