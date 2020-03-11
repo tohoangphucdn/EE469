@@ -543,7 +543,7 @@ module cycle_testbench();
 	
 	cycles dut(clk, pc, state, op, b, l, t, s, ldr, str, p, u, bit, w, offset, cond, rn, rd, rm, operand, regdata1, regdata2, memdata,
 						 regaddrIn, regaddrOut1, regaddrOut2, regdataIn, regwr, regrd1, regrd2, 
-						 memaddrIn, memaddrOut, memdataIn, memwr, memrd, bf); 
+						 memaddrIn, memaddrOut, memdataIn, memwr, memrd, bf);
 	
 	// Set up the inputs to the design. Each line is a clock cycle.
 	integer i;
