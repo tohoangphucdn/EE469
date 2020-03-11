@@ -16,11 +16,9 @@ module shifter(shift, data, out_shift, c_flag); //shifted register
 	
 	wire [4:0] shift_amount;
 	wire [1:0] shift_type;
-	wire do_shift_amount, do_shift_register;
 	reg [31:0] out;
 	reg t_c_flag;
 	
-	assign do_shift_amount = (!shift[0]) ? 1'b1 : 1'b0;
 	
 	assign shift_amount = shift[7:3];
 	assign shift_type = shift[2:1];
