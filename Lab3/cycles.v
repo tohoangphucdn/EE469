@@ -183,7 +183,7 @@ module cycles(
 				2'b11: begin
 				  // push and output
 							if (ldr) begin
-								tregaddrIn = rd;
+								tregaddrIn = rd; //stage 4
 								tregwr = 1'b1;
 								if (bit) tregdataIn = {24'b0, memdata[7:0]};
 								else tregdataIn = memdata;

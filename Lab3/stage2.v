@@ -1,9 +1,11 @@
 module stage2(
 	input wire clk, 
 	input wire [31:0] inst,
+	input wire [31:0] cpsr,
 	input wire [31:0] regdata1, regdata2,
-	
-	output wire [31:0] memdataIn, regdataIn
+	output wire [31:0] memdataIn, result,
+	output wire sOut,
+	output wire [3:0] newcondOut
 	);
 
 	
@@ -13,13 +15,14 @@ module stage2(
 	wire b, l, t, s, ldr, str, p, u, bit, w;
 	wire [23:0] offset;
 	
-	reg [31:0]  alu1, alu2,cpsr;
+	reg [31:0]  alu1, alu2;
 	wire [31:0] ALUresult, out_shift, out_rotate;
 	reg [3:0] opcode;
 	wire [3:0] newcond;
 	reg [3:0]temp;
 	reg condition, tbf;
 	wire c_flag, c_flag2;
+	wire [31:0] branchimm;
 	
 	// Temporary variables
 	reg [3:0] tregaddrIn; 
@@ -28,20 +31,11 @@ module stage2(
 	reg tregwr, tregrd1, tregrd2;
 	reg [31:0] tmemaddrIn, tmemaddrOut, tmemdataIn;
 	reg tmemwr, tmemrd;
+	reg [31:0] tcpsr;
 	
-	assign regaddrIn 		= tregaddrIn;
-	assign regaddrOut1 	= tregaddrOut1;
-	assign regaddrOut2 	= tregaddrOut2;
-	assign regdataIn 		= tregdataIn;
-	assign regwr 			= tregwr;
-	assign regrd1 			= tregrd1;
-	assign regrd2 			= tregrd2;
-	assign memaddrIn 		= tmemaddrIn;
-	assign memaddrOut 	= tmemaddrOut;
+	
 	assign memdataIn 		= tmemdataIn;
-	assign memwr 			= tmemwr;
-	assign memrd 			= tmemrd;
-	assign bf 				= tbf;
+	assign result = tregdataIn;
 
 	//conditions
 	localparam EQcc = 4'b0000;
@@ -85,38 +79,28 @@ module stage2(
 	decode decoder(inst, b, l, t, s, ldr, str, p, u, bit, w, offset, cond, op, rn, rd, rm, operand, branchimm);
 	ALU calculation(opcode, alu1, alu2, ALUresult, newcond[3], newcond[2], newcond[1], newcond[0]);
 	
-	// Altering CPSR
-	initial cpsr = 0;
-	always @(*) begin
-		if (s) cpsr = {newcond,cpsr[27:0]};
-	end
+	// Shifter calls	
+	shifter shifting (operand[11:4], regdata2, out_shift, c_flag); //carry bit of cpsr		
+	rotate rotating(operand[11:8], operand[7:0], out_rotate, c_flag2); //carry bit of cpsr
+	
+	assign newcondOut = newcond;
+	assign sOut = s;
 	
 	reg [31:0] tresult1, tresult2;
 	always @(*) begin
-		tregaddrIn = 0; tregaddrOut1 = 0; tregaddrOut2 = 0; tregdataIn = 0;
-		tregwr = 0; tregrd1 = 0; tregrd2 = 0; 
-		tmemaddrIn = 0; tmemaddrOut = 0; tmemdataIn = 0; 
-		tmemwr = 0; tmemrd = 0; 
-		opcode = 0; alu1 = 0; alu2 = 0;
-		tbf = 0;
+		tregdataIn = 0;
+		tmemdataIn = 0; 
+		opcode = 0;
+		alu1 = 0; alu2 = 0;
 		
 		if (ldr || str) begin
 			if (condition) begin
 				if (ldr) begin
-					
-					if (bit) tregdataIn = {24'b0, memdata[7:0]};
-					else tregdataIn = memdata;
 				end
 				else begin
-					if (p) tmemaddrIn = regdata2 + operand;
-					else tmemaddrIn = regdata2;
-					tmemwr = 1'b1;
-					
 					if (bit) tmemdataIn = {4{regdata1[7:0]}};
 					else tmemdataIn = regdata1;
-					
 					if (w) begin
-						tregaddrIn = rn;
 						if (u)										
 							tregdataIn = regdata2 + operand;
 						else tregdataIn = regdata2 - operand;
@@ -127,7 +111,6 @@ module stage2(
 		else begin
 			if (b) begin
 				if (condition) begin
-					tbf = 1'b1;
 					if (l) begin
 					end
 				end
@@ -144,7 +127,7 @@ module stage2(
 								if (t) alu2 = out_rotate; // send to ALU
 								else alu2 = out_shift; // send to 
 								
-								tresult2 = ALUresult;
+								tregdataIn = ALUresult;
 							end
 				
 				4'b0010: begin // SUB *
@@ -152,6 +135,8 @@ module stage2(
 								alu1 = regdata1; // send to ALU
 								if (t) alu2 = out_rotate; // send to ALU
 								else alu2 = out_shift; // send to ALU
+								
+								tregdataIn = ALUresult;
 							end
 							
 				4'b0011: begin // RSB *
@@ -162,6 +147,8 @@ module stage2(
 								alu1 = regdata1; // send to ALU
 								if (t) alu2 = out_rotate; // send to ALU
 								else alu2 = out_shift; // send to ALU
+								
+								tregdataIn = ALUresult;
 							end
 							
 				4'b0101: begin // ADC *
@@ -178,6 +165,8 @@ module stage2(
 								alu1 = regdata1; // send to ALU
 								if (t) alu2 = out_rotate; // send to ALU
 								else alu2 = out_shift; // send to ALU
+								
+								tregdataIn = ALUresult;
 							end
 							
 				4'b1001: begin// TEQ
@@ -192,6 +181,7 @@ module stage2(
 								alu1 = regdata1; // send to ALU
 								if (t) alu2 = out_rotate;
 								else alu2 = out_shift; // send to ALU
+								
 							end
 							
 				4'b1011: begin// CMN
@@ -202,18 +192,24 @@ module stage2(
 								alu1 = regdata1; // send to ALU
 								if (t) alu2 = out_rotate; // send to ALU
 								else alu2 = out_shift; // send to ALU
+								
+								tregdataIn = ALUresult;
 							end
 				4'b1101: begin// MOV
 								//enable the ALU for the work
 								opcode = 4'b1101;
 								alu1 = rd; //MOV to the destination register
 								alu2 = regdata1; //operand 2	
+								
+								tregdataIn = ALUresult;
 							end
 							
 				4'b1110: begin // BIC *
 								opcode = 4'b1110;
 								alu1 = regdata1;
-								alu2 = regdata2;											
+								alu2 = regdata2;	
+
+								tregdataIn = ALUresult;
 							end
 
 				4'b1111: begin // MVN
@@ -221,6 +217,8 @@ module stage2(
 								opcode = 4'b1111;
 								alu1 = rd; //MVN to the destination register
 								alu2 = regdata1; //operand 2	
+								
+								tregdataIn = ALUresult;
 							end
 				endcase
 			end

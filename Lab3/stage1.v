@@ -1,8 +1,11 @@
 module stage1(
 	input wire clk, 
 	input wire [31:0] inst,
+	input wire [31:0] cpsr,
 	output wire regrd1, regrd2,
-	output wire [3:0] regaddrOut1, regaddrOut2
+	output wire [3:0] regaddrOut1, regaddrOut2,
+	output wire bf,
+	output wire [31:0] branchimm
 	);
 
 	wire [3:0] cond, op, rn, rd, rm; 
@@ -12,32 +15,25 @@ module stage1(
 	wire [23:0] offset;
 	
 	//////////////////////////////////////////
-	reg [31:0]  alu1, alu2,cpsr;
+	reg [31:0]  alu1, alu2;
 	wire [31:0] ALUresult, out_shift, out_rotate;
 	reg [3:0] opcode;
 	wire [3:0] newcond;
 	reg [3:0]temp;
 	reg condition, tbf;
 	wire c_flag, c_flag2;
+
 	
 	// Temporary variables
 	reg [3:0] tregaddrOut1, tregaddrOut2;
-	wire tregrd1, tregrd2;
+	reg tregrd1, tregrd2;
 	
-	assign regaddrIn 		= tregaddrIn;
-	assign regaddrOut1 	= tregaddrOut1;
-	assign regaddrOut2 	= tregaddrOut2;
-	assign regdataIn 		= tregdataIn;
-	assign regwr 			= tregwr;
-	assign regrd1 			= tregrd1;
-	assign regrd2 			= tregrd2;
-	assign memaddrIn 		= tmemaddrIn;
-	assign memaddrOut 	= tmemaddrOut;
-	assign memdataIn 		= tmemdataIn;
-	assign memwr 			= tmemwr;
-	assign memrd 			= tmemrd;
-	assign bf 				= tbf;
-
+	assign regrd1 = tregrd1;
+	assign regrd2 = tregrd2;
+	assign regaddrOut1 = tregaddrOut1;
+	assign regaddrOut2 = tregaddrOut2;
+	assign bf = tbf;
+	
 	//conditions
 	localparam EQcc = 4'b0000;
 	localparam NEcc = 4'b0001;
@@ -80,15 +76,9 @@ module stage1(
 	
 	decode decoder(inst, b, l, t, s, ldr, str, p, u, bit, w, offset, cond, op, rn, rd, rm, operand, branchimm);
 
-	
-	
 	always @(*) begin
-		tregaddrIn = 0; tregaddrOut1 = 0; tregaddrOut2 = 0; tregdataIn = 0;
-		tregwr = 0; tregrd1 = 0; tregrd2 = 0; 
-		tmemaddrIn = 0; tmemaddrOut = 0; tmemdataIn = 0; 
-		tmemwr = 0; tmemrd = 0; 
-		opcode = 0; alu1 = 0; alu2 = 0;
-		tbf = 0;
+		tregaddrOut1 = 0; tregaddrOut2 = 0; tbf = 0;
+		tregrd1 = 0; tregrd2 = 0; 
 		if (ldr || str) begin
 			if (condition) begin
 				// read register 
@@ -108,9 +98,9 @@ module stage1(
 					tbf = 1'b1;
 					if (l) begin
 						//register file connection
-						tregaddrIn = 4'b1110; //if there is BL, store to register 14
-						tregdataIn = pc; //connect to pc
-						tregwr = 1'b1;
+						//tregaddrIn = 4'b1110; //if there is BL, store to register 14
+						//tregdataIn = pc; //connect to pc
+						//tregwr = 1'b1;
 					end
 				end
 			end
