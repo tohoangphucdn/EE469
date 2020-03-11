@@ -1,6 +1,7 @@
+
 module operation(
 	input wire clk,
-	input wire [31:0] inst,
+	input wire [31:0] inst0,
 	input wire [31:0] regdata1, regdata2, memdata	
 	
 	output wire [3:0] regaddrIn, 
@@ -12,21 +13,21 @@ module operation(
 	output wire bf
 	);
 	
+	reg [31:0] inst1, inst2, inst3, inst4;
 	always @(posedge clk) begin
-		inst1 <= inst;
+		inst1 <= inst0;
 		inst2 <= inst1;
 		inst3 <= inst2;
 		inst4 <= inst3;
-		inst5 <= inst4;
 	end
 	
-	stage2 two(clk, inst2, regrd1, regrd2, regaddrOut1, regaddrOut2);
 	
-	stage3 three(clk, inst3, result);
+	stage1 one(clk, inst1, regrd1, regrd2, regaddrOut1, regaddrOut2);
 	
-	stage4 four(clk, inst4, memwr, memrd, memaddrIn, memaddrOut, memdataIn);
+	stage2 two(clk, inst2, regdata1, regdata2, memdataIn, regdataIn);
 	
-	stage5 five(clk, inst5, regwr, regaddrIn, regaddrOut2);
-
+	stage3 three(clk, inst3, regdata2, memwr, memrd, memaddrIn, memaddrOut, memdataIn);
+	
+	stage4 four(clk, inst4, regwr, regaddrIn, regaddrOut2);
 endmodule
 		
