@@ -25,8 +25,13 @@ module cpu(
 	wire [3:0] regaddrIn, regaddrOut1, regaddrOut2;
 	wire regwr, regrd1, regrd2, memwr, memrd;
 	wire [31:0] regdataIn, memaddrIn, memaddrOut, memdataIn; 
-	wire bf;
+	wire bf, h_flag, h_flag2, h_flag3;
 	wire [31:0] branchimm;
+	wire [3:0] cond, op, rn, rd, rm; 
+	wire [11:0] operand;
+	wire [7:0] out1, out2, out3, out4, out5;
+	wire b, l, t, s, ldr, str, p, u, bit, w;
+	wire [23:0] offset;
 	
 	// Controls the LED on the board.
 	assign led = 1'b1;
@@ -39,7 +44,7 @@ module cpu(
 	
 	assign inst = inst_full[pc];
 	
-	//decode decoder(inst, b, l, t, s, ldr, str, p, u, bit, w, offset, cond, op, rn, rd, rm, operand, branchimm);
+	decode decoder(inst, b, l, t, s, ldr, str, p, u, bit, w, offset, cond, op, rn, rd, rm, operand, branchimm);
 //
 //	cycles operation(clk, pc, state, op, b, l, t, s, ldr, str, p, u, bit, w, offset, cond, rn, rd, rm, operand, regdata1, regdata2, memdata,
 //						 regaddrIn, regaddrOut1, regaddrOut2, regdataIn, regwr, regrd1, regrd2, 
@@ -47,7 +52,7 @@ module cpu(
 
 	operation run(clk, inst, pc, regdata1, regdata2, memdata,
 						 regaddrIn, regaddrOut1, regaddrOut2, regdataIn, regwr, regrd1, regrd2, 
-						 memaddrIn, memaddrOut, memdataIn, memwr, memrd, bf, branchimm);
+						 memaddrIn, memaddrOut, memdataIn, memwr, memrd, h_flag, h_flag2, h_flag3);
 	
 
 	registers RAM(clk, regaddrIn, regaddrOut1, regaddrOut2, regdataIn, regwr, regrd1, regrd2, regdata1, regdata2);
@@ -63,8 +68,10 @@ module cpu(
 			pc <= 32'b0;
 		end
 		else begin
-				if (!bf) pc <= pc + 1;
+			if ((!h_flag) && (!h_flag2) && (!h_flag3)) begin
+				if (!b) pc <= pc + 1;
 				else pc <= pc + ((branchimm + 4'b1000) >> 2);
+			end				
 		end
 	end
 	

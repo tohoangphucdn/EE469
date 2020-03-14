@@ -1,5 +1,6 @@
 module stage2(
 	input wire clk, 
+	input wire [31:0] pc,
 	input wire [31:0] inst,
 	input wire [31:0] cpsr,
 	input wire [31:0] regdata1, regdata2,
@@ -112,6 +113,7 @@ module stage2(
 			if (b) begin
 				if (condition) begin
 					if (l) begin
+						tregdataIn = pc;
 					end
 				end
 			end

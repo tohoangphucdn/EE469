@@ -3,9 +3,9 @@ module stage1(
 	input wire [31:0] inst,
 	input wire [31:0] cpsr,
 	output wire regrd1, regrd2,
-	output wire [3:0] regaddrOut1, regaddrOut2,
-	output wire bf,
-	output wire [31:0] branchimm
+	output wire [3:0] regaddrOut1, regaddrOut2//,
+	//output wire bf,
+	//output wire [31:0] branchimm
 	);
 
 	wire [3:0] cond, op, rn, rd, rm; 
@@ -16,7 +16,7 @@ module stage1(
 	
 	//////////////////////////////////////////
 	reg [31:0]  alu1, alu2;
-	wire [31:0] ALUresult, out_shift, out_rotate;
+	wire [31:0] ALUresult, out_shift, out_rotate, branchimm;
 	reg [3:0] opcode;
 	wire [3:0] newcond;
 	reg [3:0]temp;
@@ -32,7 +32,7 @@ module stage1(
 	assign regrd2 = tregrd2;
 	assign regaddrOut1 = tregaddrOut1;
 	assign regaddrOut2 = tregaddrOut2;
-	assign bf = tbf;
+	//assign bf = tbf;
 	
 	//conditions
 	localparam EQcc = 4'b0000;

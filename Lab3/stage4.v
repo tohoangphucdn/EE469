@@ -4,7 +4,6 @@ module stage4(
 	input wire [31:0] cpsr,
 	input wire [31:0] result,
 	input wire [31:0] memdata,
-	input wire [31:0] pc,
 	output wire regwr,
 	output wire [3:0] regaddrIn,
 	output wire [31:0] regdataIn
@@ -105,12 +104,13 @@ module stage4(
 					if (l) begin
 						//register file connection
 						tregaddrIn = 4'b1110; //if there is BL, store to register 14
-						tregdataIn = pc; //connect to pc
+						tregdataIn = result; //connect to pc
 						tregwr = 1'b1;
 					end
 				end
 			end
-			else
+			else begin
+				tregdataIn = result;
 				case (op)
 				4'b0000: begin // AND
 							end
@@ -174,5 +174,6 @@ module stage4(
 							end
 				endcase
 			end
-	   end
+		end
+	  end
 endmodule 
