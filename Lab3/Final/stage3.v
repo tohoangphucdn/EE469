@@ -31,7 +31,7 @@ module stage3(
 	reg condition;
 	
 	// Temporary variables
-	reg [31:0] tmemaddrIn, tmemaddrOut, tmemdataIn;
+	reg [31:0] tmemaddrIn, tmemaddrOut;
 	reg tmemwr, tmemrd;
 	
 	
@@ -82,7 +82,7 @@ module stage3(
 	decode decoder(inst, b, l, t, s, ldr, str, p, u, bit, w, offset, cond, op, rn, rd, rm, operand, branchimm);
 	
 	always @(*) begin
-		tmemaddrIn = 0; tmemaddrOut = 0; tmemdataIn = 0; 
+		tmemaddrIn = 0; tmemaddrOut = 0; 
 		tmemwr = 0; tmemrd = 0; 
 		if (ldr || str) begin
 			if (condition) begin
@@ -94,11 +94,7 @@ module stage3(
 				else begin
 					if (p) tmemaddrIn = regdata2 + operand;
 					else tmemaddrIn = regdata2;
-					tmemwr = 1'b1;
-					
-					if (bit) tmemdataIn = {4{regdata1[7:0]}};
-					else tmemdataIn = regdata1;
-					
+					tmemwr = 1'b1;					
 					if (w) begin
 					end
 				end

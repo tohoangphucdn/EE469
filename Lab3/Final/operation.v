@@ -46,9 +46,10 @@ module operation(
 	wire s, h_flag, h_flag_1, h_flag_2;
 	reg h_flag2, h_flag3;
 	wire [3:0] newcond;
-	reg [31:0] pc1, pc2, pc3, pc4;
-	reg [31:0] regdata1_3, regdata2_3;
-	
+	reg [31:0] pc1, pc2, pc3;
+	reg [31:0] regdata1_3, regdata2_3;	
+
+	reg [31:0] cpsr, cpsr3, cpsr4;
 	
 	always @(posedge clk) begin
 		if ((!h_flag) && (!h_flag2) && (!h_flag3)) begin
@@ -60,8 +61,6 @@ module operation(
 		else	inst2 <= 32'b0;
 		inst3 <= inst2;
 		inst4 <= inst3;
-		pc3 <= pc2;
-		pc4 <= pc3;
 		result3 <= result;
 		result4 <= result3;
 		h_flag2 <= h_flag;
@@ -69,11 +68,11 @@ module operation(
 		regdata1_3 <= regdata1;
 		regdata2_3 <= regdata2;
 		tmemdataIn <= result2;
+		cpsr3 <= cpsr;
+		cpsr4 <= cpsr3;
 		//regdata1_3 <= regdata1_2;
 		//regdata2_3 <= regdata2_2;
 	end
-
-	reg [31:0] cpsr;
 	
 	// Altering CPSR
 	initial cpsr = 0;
@@ -97,8 +96,8 @@ module operation(
 	
 	stage2 two(clk, pc2, inst2, cpsr, regdata1, regdata2, result2, result, s, newcond);
 	
-	stage3 three(clk, inst3, cpsr, regdata1_3, regdata2_3, memwr, memrd, memaddrIn, memaddrOut);//, memdataIn);
+	stage3 three(clk, inst3, cpsr3, regdata1_3, regdata2_3, memwr, memrd, memaddrIn, memaddrOut);//, memdataIn);
 	
-	stage4 four(clk, inst4, cpsr, result4, memdata, regwr, regaddrIn, regdataIn);
+	stage4 four(clk, inst4, cpsr4, result4, memdata, regwr, regaddrIn, regdataIn);
 endmodule
 		
