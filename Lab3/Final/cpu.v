@@ -52,7 +52,7 @@ module cpu(
 
 	operation run(clk, inst, pc, regdata1, regdata2, memdata,
 						 regaddrIn, regaddrOut1, regaddrOut2, regdataIn, regwr, regrd1, regrd2, 
-						 memaddrIn, memaddrOut, memdataIn, memwr, memrd, h_flag, h_flag2, h_flag3);
+						 memaddrIn, memaddrOut, memdataIn, memwr, memrd, h_flag, h_flag2, h_flag3, bf);
 	
 
 	registers RAM(clk, regaddrIn, regaddrOut1, regaddrOut2, regdataIn, regwr, regrd1, regrd2, regdata1, regdata2);
@@ -69,7 +69,7 @@ module cpu(
 		end
 		else begin
 			if ((!h_flag) && (!h_flag2) && (!h_flag3)) begin
-				if (!b) pc <= pc + 1;
+				if (!bf) pc <= pc + 1;
 				else pc <= pc + ((branchimm + 4'b1000) >> 2);
 			end				
 		end

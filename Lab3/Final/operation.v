@@ -35,7 +35,7 @@ module operation(
 	output wire regwr, regrd1, regrd2,
 	output wire [31:0] memaddrIn, memaddrOut, memdataIn,
 	output wire memwr, memrd,
-	output wire hf, hf2, hf3
+	output wire hf, hf2, hf3, bf
 	);
 	
 	reg [31:0] inst1, inst2, inst3, inst4;
@@ -83,6 +83,7 @@ module operation(
 	assign hf = h_flag;
 	assign hf2 = h_flag2;
 	assign hf3 = h_flag3;
+//	assign bf = b_flag;
 	assign memdataIn = tmemdataIn;
 	
 	// Hazard detection
@@ -91,6 +92,7 @@ module operation(
 	
 	assign h_flag = (h_flag_1 || h_flag_2);
 	
+	stage0 zero(clk, inst0, cpsr, bf);
 	
 	stage1 one(clk, inst1, cpsr, regrd1, regrd2, regaddrOut1, regaddrOut2);
 	
