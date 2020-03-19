@@ -130,7 +130,9 @@ module cpu(
 		end
 		else begin
 			if ((!h_flag) && (!h_flag2) && (!h_flag3)) begin
-				if (!bf) pc <= pc + 1;
+				if (!bf) begin
+					if (inst0 != 32'b0) pc <= pc + 1;
+				end
 				else pc <= pc + ((branchimm + 4'b1000) >> 2);
 			end				
 		end
