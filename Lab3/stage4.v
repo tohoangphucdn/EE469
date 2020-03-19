@@ -1,9 +1,24 @@
+/* Control stage 4 of pipeline (Write to reg file)
+
+	Input:
+		clk							: clock signal
+		inst							: 32-bit current instruction
+		cpsr							: 32-bit condition controller				
+		result						: 32-bit result of calculation
+		memdata						: 32-bit output data from memory
+		
+	Output:
+		regwr							: write signal for reg file
+		regaddrIn					: 4-bit input address for reg file
+		regdataIn					: 32-bit input data for reg file
+*/		
 module stage4(
 	input wire clk, 
 	input wire [31:0] inst,
 	input wire [31:0] cpsr,
 	input wire [31:0] result,
 	input wire [31:0] memdata,
+	
 	output wire regwr,
 	output wire [3:0] regaddrIn,
 	output wire [31:0] regdataIn
@@ -14,10 +29,8 @@ module stage4(
 	wire [7:0] out1, out2, out3, out4, out5;
 	wire b, l, t, s, ldr, str, p, u, bit, w;
 	wire [23:0] offset;
-	reg condition, tbf;
+	reg condition;
 	wire [31:0] branchimm;
-	//reg [31:0]  cpsr;
-	wire [3:0] newcond;
 	
 	
 	// Temporary variables
@@ -74,11 +87,8 @@ module stage4(
 	
 	
 	// Cycling through the states of the operations
-	always @(*) begin
-		tregaddrIn = 0; 
-		tregwr = 0; 
-		tregdataIn = 0;
-		
+	always @(*) begin		
+		tregwr = 0; tregaddrIn = 0; tregdataIn = 0;		
 		if (ldr || str) begin
 			if (condition) begin
 				if (ldr) begin

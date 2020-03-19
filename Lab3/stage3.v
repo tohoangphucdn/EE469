@@ -1,40 +1,42 @@
+/* Control stage 3 of pipeline (Write/read on memory)
+
+	Input:
+		clk							: clock signal
+		inst							: 32-bit current instruction
+		cpsr							: 32-bit condition controller		
+		regdata1, regdata2		: 32-bit output data from reg file
+		
+	Output:
+		memwr							: write signal for mem file
+		memrd							: read signals for memory
+		memaddrIn					: 32-bit input address for memory
+		memaddrOut					: 32-bit output address for memory
+*/		
 module stage3(
 	input wire clk, 
 	input wire [31:0] inst,
 	input wire [31:0] cpsr,
 	input wire [31:0] regdata1, regdata2,
+	
 	output wire memwr, memrd,
-	output wire [31:0] memaddrIn, memaddrOut//, memdataIn
-	);
-
-				// 	stage3 four(clk, inst4, memwr, memrd, memaddrIn, memaddrOut, memdataIn);
+	output wire [31:0] memaddrIn, memaddrOut
+	);				
 
 	wire [3:0] cond, op, rn, rd, rm; 
 	wire [11:0] operand;
 	wire [7:0] out1, out2, out3, out4, out5;
 	wire b, l, t, s, ldr, str, p, u, bit, w, bf;
 	wire [23:0] offset;
-	
-	reg [31:0]  alu1, alu2;
-	wire [31:0] ALUresult, out_shift, out_rotate;
-	reg [3:0] opcode;
-	wire [3:0] newcond;
-	reg [3:0]temp;
+	wire [31:0] branchimm;		
 	reg condition;
-	wire c_flag, c_flag2;
-	wire [31:0] branchimm;
+	
 	// Temporary variables
-	reg [3:0] tregaddrIn; 
-	reg [3:0] tregaddrOut1, tregaddrOut2;
-	reg [31:0] tregdataIn;
-	reg tregwr, tregrd1, tregrd2;
-	reg [31:0] tmemaddrIn, tmemaddrOut, tmemdataIn;
+	reg [31:0] tmemaddrIn, tmemaddrOut;
 	reg tmemwr, tmemrd;
 	
 	
 	assign memaddrIn 		= tmemaddrIn;
 	assign memaddrOut 	= tmemaddrOut;
-	//assign memdataIn 		= tmemdataIn;
 	assign memwr 			= tmemwr;
 	assign memrd 			= tmemrd;
 
@@ -80,7 +82,7 @@ module stage3(
 	decode decoder(inst, b, l, t, s, ldr, str, p, u, bit, w, offset, cond, op, rn, rd, rm, operand, branchimm);
 	
 	always @(*) begin
-		tmemaddrIn = 0; tmemaddrOut = 0; tmemdataIn = 0; 
+		tmemaddrIn = 0; tmemaddrOut = 0; 
 		tmemwr = 0; tmemrd = 0; 
 		if (ldr || str) begin
 			if (condition) begin
@@ -92,11 +94,7 @@ module stage3(
 				else begin
 					if (p) tmemaddrIn = regdata2 + operand;
 					else tmemaddrIn = regdata2;
-					tmemwr = 1'b1;
-					
-					if (bit) tmemdataIn = {4{regdata1[7:0]}};
-					else tmemdataIn = regdata1;
-					
+					tmemwr = 1'b1;					
 					if (w) begin
 					end
 				end

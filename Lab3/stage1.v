@@ -1,11 +1,21 @@
+/* Control stage 1 of the pipelines (Read from reg file)
+
+	Input:
+		clk							: clock signal
+		inst							: 32-bit current instruction		
+		cpsr							: 32-bit condition controller
+
+	Output:
+		regrd1, regrd2				: read signals for reg file
+		regaddrOut1, regaddrOut2: 32-bit output addresses for reg file
+*/
+
 module stage1(
 	input wire clk, 
 	input wire [31:0] inst,
 	input wire [31:0] cpsr,
 	output wire regrd1, regrd2,
-	output wire [3:0] regaddrOut1, regaddrOut2//,
-	//output wire bf,
-	//output wire [31:0] branchimm
+	output wire [3:0] regaddrOut1, regaddrOut2
 	);
 
 	wire [3:0] cond, op, rn, rd, rm; 
@@ -13,16 +23,8 @@ module stage1(
 	wire [7:0] out1, out2, out3, out4, out5;
 	wire b, l, t, s, ldr, str, p, u, bit, w;
 	wire [23:0] offset;
-	
-	//////////////////////////////////////////
-	reg [31:0]  alu1, alu2;
-	wire [31:0] ALUresult, out_shift, out_rotate, branchimm;
-	reg [3:0] opcode;
-	wire [3:0] newcond;
-	reg [3:0]temp;
-	reg condition, tbf;
-	wire c_flag, c_flag2;
-
+	wire [31:0] branchimm;
+	reg condition;
 	
 	// Temporary variables
 	reg [3:0] tregaddrOut1, tregaddrOut2;
@@ -32,7 +34,6 @@ module stage1(
 	assign regrd2 = tregrd2;
 	assign regaddrOut1 = tregaddrOut1;
 	assign regaddrOut2 = tregaddrOut2;
-	//assign bf = tbf;
 	
 	//conditions
 	localparam EQcc = 4'b0000;
@@ -72,12 +73,11 @@ module stage1(
 			default: condition = 1'b1;
 		endcase
 	end
-	///////////////////////////////////////////////////////
 	
 	decode decoder(inst, b, l, t, s, ldr, str, p, u, bit, w, offset, cond, op, rn, rd, rm, operand, branchimm);
 
 	always @(*) begin
-		tregaddrOut1 = 0; tregaddrOut2 = 0; tbf = 0;
+		tregaddrOut1 = 0; tregaddrOut2 = 0;
 		tregrd1 = 0; tregrd2 = 0; 
 		if (ldr || str) begin
 			if (condition) begin
@@ -89,18 +89,15 @@ module stage1(
 				else begin
 					tregaddrOut1 = rd;
 					tregrd1 = 1'b1;
+					tregaddrOut2 = rn;
+					tregrd2 = 1'b1;
 				end						
 			end
 		end
 		else begin
 			if (b) begin
 				if (condition) begin
-					tbf = 1'b1;
 					if (l) begin
-						//register file connection
-						//tregaddrIn = 4'b1110; //if there is BL, store to register 14
-						//tregdataIn = pc; //connect to pc
-						//tregwr = 1'b1;
 					end
 				end
 			end

@@ -1,9 +1,27 @@
+/* Control stage 2 of pipeline (Execute calculation)
+
+	Input:
+		clk							: clock signal
+		pc								: 32-bit program counter	
+		inst							: 32-bit current instruction
+		cpsr							: 32-bit condition controller		
+		regdata1, regdata2		: 32-bit output data from reg file
+		
+	Output:
+		memdataIn					: 32-bit input data for memory
+		result						: 32-bit result of calculation
+		memwr							: write signal for mem file
+		memrd							: read signals for memory
+		sOut							: flag to change condition controller
+		newcondOut					: 4-bit updated condition		
+*/		
 module stage2(
 	input wire clk, 
 	input wire [31:0] pc,
 	input wire [31:0] inst,
 	input wire [31:0] cpsr,
 	input wire [31:0] regdata1, regdata2,
+	
 	output wire [31:0] memdataIn, result,
 	output wire sOut,
 	output wire [3:0] newcondOut
@@ -14,7 +32,8 @@ module stage2(
 	wire [11:0] operand;
 	wire [7:0] out1, out2, out3, out4, out5;
 	wire b, l, t, s, ldr, str, p, u, bit, w;
-	wire [23:0] offset;
+	wire [23:0] offset;	
+	wire [31:0] branchimm;
 	
 	reg [31:0]  alu1, alu2;
 	wire [31:0] ALUresult, out_shift, out_rotate;
@@ -23,7 +42,6 @@ module stage2(
 	reg [3:0]temp;
 	reg condition, tbf;
 	wire c_flag, c_flag2;
-	wire [31:0] branchimm;
 	
 	// Temporary variables
 	reg [3:0] tregaddrIn; 
