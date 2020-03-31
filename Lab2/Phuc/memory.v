@@ -31,8 +31,8 @@ module memory(
 	
 	// Initial Block
 	initial begin
-		for (i=0; i < 31; i = i + 1) 
-			mem[i] = 32'b0;
+		for (i=0; i < 32; i = i + 1) 
+			mem[i] = 8'b0;
 	end
 	
 //	always @(posedge clk) begin

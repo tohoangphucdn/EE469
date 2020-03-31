@@ -71,7 +71,8 @@ module cycles(
 	
 	// Temporary variables
 	reg [3:0] tregaddrIn; 
-	reg [31:0] tregaddrOut1, tregaddrOut2, tregdataIn;
+	reg [3:0] tregaddrOut1, tregaddrOut2;
+	reg [31:0] tregdataIn;
 	reg tregwr, tregrd1, tregrd2;
 	reg [31:0] tmemaddrIn, tmemaddrOut, tmemdataIn;
 	reg tmemwr, tmemrd;
@@ -215,7 +216,7 @@ module cycles(
 					tbf = 1'b1;
 					if (l) begin
 						//register file connection
-						tregaddrIn = 31'b1110; //if there is BL, store to register 14
+						tregaddrIn = 4'b1110; //if there is BL, store to register 14
 						tregdataIn = pc; //connect to pc
 						tregwr = 1'b1;
 					end
@@ -542,7 +543,7 @@ module cycle_testbench();
 	
 	cycles dut(clk, pc, state, op, b, l, t, s, ldr, str, p, u, bit, w, offset, cond, rn, rd, rm, operand, regdata1, regdata2, memdata,
 						 regaddrIn, regaddrOut1, regaddrOut2, regdataIn, regwr, regrd1, regrd2, 
-						 memaddrIn, memaddrOut, memdataIn, memwr, memrd, bf, branchimm); 
+						 memaddrIn, memaddrOut, memdataIn, memwr, memrd, bf);
 	
 	// Set up the inputs to the design. Each line is a clock cycle.
 	integer i;

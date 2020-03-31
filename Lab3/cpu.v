@@ -18,18 +18,15 @@ module cpu(
 	reg [31:0] inst_full [100:0];
 	reg [31:0] pc;
 	reg [1:0] state;
-	wire [3:0] cond, op, rn, rd, rm; 
-	wire [11:0] operand;
-	wire [7:0] out1, out2, out3, out4, out5;
-	wire b, l, t, s, ldr, str, p, u, bit, w;
-	wire [23:0] offset;
+	
+	
 	
 	// Reg files and memory controller
 	wire [3:0] regaddrIn, regaddrOut1, regaddrOut2;
 	wire regwr, regrd1, regrd2, memwr, memrd;
 	wire [31:0] regdataIn, memaddrIn, memaddrOut, memdataIn; 
 	wire bf;
-	wire [31:0] branchimm; 
+	wire [31:0] branchimm;
 	
 	// Controls the LED on the board.
 	assign led = 1'b1;
@@ -42,11 +39,15 @@ module cpu(
 	
 	assign inst = inst_full[pc];
 	
-	decode decoder(inst, b, l, t, s, ldr, str, p, u, bit, w, offset, cond, op, rn, rd, rm, operand, branchimm);
+	//decode decoder(inst, b, l, t, s, ldr, str, p, u, bit, w, offset, cond, op, rn, rd, rm, operand, branchimm);
+//
+//	cycles operation(clk, pc, state, op, b, l, t, s, ldr, str, p, u, bit, w, offset, cond, rn, rd, rm, operand, regdata1, regdata2, memdata,
+//						 regaddrIn, regaddrOut1, regaddrOut2, regdataIn, regwr, regrd1, regrd2, 
+//						 memaddrIn, memaddrOut, memdataIn, memwr, memrd, bf)
 
-	cycles operation(clk, pc, state, op, b, l, t, s, ldr, str, p, u, bit, w, offset, cond, rn, rd, rm, operand, regdata1, regdata2, memdata,
+	operation run(clk, inst, pc, regdata1, regdata2, memdata,
 						 regaddrIn, regaddrOut1, regaddrOut2, regdataIn, regwr, regrd1, regrd2, 
-						 memaddrIn, memaddrOut, memdataIn, memwr, memrd, bf); 
+						 memaddrIn, memaddrOut, memdataIn, memwr, memrd, bf, branchimm);
 	
 
 	registers RAM(clk, regaddrIn, regaddrOut1, regaddrOut2, regdataIn, regwr, regrd1, regrd2, regdata1, regdata2);
@@ -55,35 +56,30 @@ module cpu(
 	
 	
 	
-	interpreter inter(b, l, t, offset, op, rn, rd, rm, operand, out1, out2, out3, out4, out5);
+//	interpreter inter(b, l, t, offset, op, rn, rd, rm, operand, out1, out2, out3, out4, out5);
 	
 	always @(posedge clk) begin
 		if (reset) begin
-			state <= 2'b00;
 			pc <= 32'b0;
 		end
 		else begin
-			if (state == 2'b11) begin
 				if (!bf) pc <= pc + 1;
 				else pc <= pc + ((branchimm + 4'b1000) >> 2);
-				state <= 2'b00;
-			end
-			else state <= state + 1'b1;
 		end
 	end
 	
 	
 	// These are how you communicate back to the serial port debugger.
 	assign debug_port1 = pc << 2;
-	assign debug_port2 = cond;
+	assign debug_port2 = 0;
 	
 	
 	// Logic for register fields
-	assign debug_port3 = out1;
-	assign debug_port4 = out2;
-	assign debug_port5 = out3;
-	assign debug_port6 = out4;	
-	assign debug_port7 = out5;
+	assign debug_port3 = 0;
+	assign debug_port4 = 0;
+	assign debug_port5 = 0;
+	assign debug_port6 = 0;	
+	assign debug_port7 = 0;
 	
 
 endmodule

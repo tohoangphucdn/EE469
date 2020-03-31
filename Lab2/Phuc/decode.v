@@ -21,7 +21,7 @@ module decode(
 	output wire [31:0] branchimm
 	);
 	
-	reg [3:0] rn_temp, rd_temp, rm_temp, r1_temp, r2_temp;
+	reg [3:0] r1_temp, r2_temp;
 	reg [2:0] type;
 	reg optype;
 	reg b, l;
@@ -55,12 +55,9 @@ module decode(
 		
 		type = inst[27:26];
 		b = 1'b0; l = 1'b0; ldr_temp = 1'b0; str_temp = 1'b0;
-		rn_temp = 4'b0; rd_temp = 4'b0; rm_temp = 4'b0;
+		
 		case (type)
 			2'b00: begin
-						rn_temp = inst[19:16];
-						rd_temp = inst[15:12];
-						rm_temp = inst[3:0];
 					end	
 			2'b01: begin
 						ldr_temp = inst[20];
